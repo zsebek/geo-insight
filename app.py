@@ -35,17 +35,18 @@ if ncfa:
         no_mov_stats = stats['no-moving']
         nmpz_stats = stats['nmpz']
 
+        # JSON printing (now in the correct place)
+        if st.button("Print Game JSON (Caution: Large Output)"):
+            game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(game_tokens) - 1, value=0)
+            try:
+                game_token = game_tokens[game_index]
+                game_data = session.get(f"{utils.BASE_URL_V3}/games/{game_token}").json()
+                st.write(json.dumps(game_data, indent=4))
+            except Exception as e:
+                st.error(f"Error fetching or displaying JSON: {e}")
 
-    # New: Button to trigger JSON printing
-    if st.button("Print Game JSON (Caution: Large Output)"):
-        # Select a game to print
-        game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(game_tokens) - 1, value=0)
-        try:
-            game_token = game_tokens[game_index]
-            game_data = session.get(f"{utils.BASE_URL_V3}/games/{game_token}").json()
-            st.write(json.dumps(game_data, indent=4))  # Display in Streamlit
-        except Exception as e:
-            st.error(f"Error fetching or displaying JSON: {e}")
+
+
     #
 
         def plot_and_display_data(stats, label):
