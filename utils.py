@@ -569,3 +569,39 @@ def plot_guessed_locations(guessed_locations):
     sm._A = []
     fig.colorbar(sm, cax=cax, orientation='horizontal', label='Score')
     return fig
+
+def plot_guessed_locations_2(guessed_locations):
+    guessed_lat = []
+    guessed_lng = []
+    round_scores = []
+    
+    for guessed_loc in guessed_locations:
+        guessed_lat.append(guessed_loc['lat'])
+        guessed_lng.append(guessed_loc['lng'])
+        round_scores.append(guessed_loc['score'])
+        
+    guessed_df = pd.DataFrame({'lat': guessed_lat,
+                               'lng': guessed_lng,
+                               'score': round_scores})
+    
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+    guessed_geometry = [Point(xy) for xy in zip(guessed_df['lng'], guessed_df['lat'])]
+    guessed_gdf = GeoDataFrame(guessed_df, geometry=guessed_geometry)
+
+
+    ax = guessed_gdf.plot(ax=world.plot(figsize=(10,10), color='lightblue'), marker='o', markersize=3,
+                    cax='score', cmap='YlOrRd', vmin=0, vmax=5000)
+    
+    # Variation 1: Different Colormap and Marker
+    fig, ax = plt.subplots(figsize=(10, 10))  # Create figure and axes explicitly
+    world.plot(ax=ax, color='lightgray', edgecolor='black')  # Add world map first
+    guessed_gdf.plot(ax=ax, marker='*', markersize=5, cax='score', cmap='viridis', vmin=0, vmax=5000, label="Guessed Locations") #label added
+    ax.set_title('Guessed Locations (Variation 1)')
+    ax.set_axis_off()
+    # Colorbar (improved placement)
+    sm = plt.cm.ScalarMappable(cmap='viridis', norm=plt.Normalize(vmin=0, vmax=5000))
+    sm._A = []
+    cbar = fig.colorbar(sm, ax=ax, shrink=0.6, label='Score') # shrink added
+    ax.legend() #legend added
+    return fig

@@ -45,6 +45,7 @@ if ncfa:
             points_hist_fig = utils.points_histogram(stats)
             countries_bar_fig = utils.plot_countries_bar_chart(stats)
             guessed_loc_fig = utils.plot_guessed_locations(stats['guessed_locations'])
+            guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
 
             # Displaying data and figures in the corresponding tab
             with label:
