@@ -605,3 +605,21 @@ def plot_guessed_locations_2(guessed_locations):
     cbar = fig.colorbar(sm, ax=ax, shrink=0.6, label='Score') # shrink added
     ax.legend() #legend added
     return fig
+
+
+
+
+# Printing the game function
+def print_game_json(session, game_tokens, number_of_games):
+    """Prints the raw JSON response for each game."""
+
+    for i, token in enumerate(game_tokens[:number_of_games]):
+        try:
+            game = session.get(f"{BASE_URL_V3}/games/{token}").json()
+            print(json.dumps(game, indent=4))  # Print the JSON with indentation
+            print("-" * 50)  # Separator between games
+
+        except Exception as e:
+            print(f"Error fetching game {token}: {e}")
+            continue  # Continue to the next game even if one fails
+
