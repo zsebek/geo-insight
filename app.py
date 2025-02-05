@@ -35,8 +35,9 @@ if ncfa:
         no_mov_stats = stats['no-moving']
         nmpz_stats = stats['nmpz']
 
-        # JSON printing (now in the correct place)
-        if st.button("Print Game JSON (Caution: Large Output)"):
+    # JSON printing (separate button, always visible)
+    if st.button("Print Game JSON (Caution: Large Output)"):  # Separate JSON printing button
+        if 'game_tokens' in locals(): #Check if game_tokens exists, if not, it will throw an error
             game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(game_tokens) - 1, value=0)
             try:
                 game_token = game_tokens[game_index]
@@ -44,6 +45,8 @@ if ncfa:
                 st.write(json.dumps(game_data, indent=4))
             except Exception as e:
                 st.error(f"Error fetching or displaying JSON: {e}")
+        else:
+            st.error("Please click 'Analyze' first to fetch game data.")
 
 
 
