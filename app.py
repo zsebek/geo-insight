@@ -45,6 +45,7 @@ if ncfa:
             points_hist_fig = utils.points_histogram(stats)
             countries_bar_fig = utils.plot_countries_bar_chart(stats)
             guessed_loc_fig = utils.plot_guessed_locations(stats['guessed_locations'])
+            # Add my new plot here
             guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
 
             # Displaying data and figures in the corresponding tab
@@ -72,6 +73,8 @@ if ncfa:
                 st.pyplot(points_vs_time_fig)
                 st.pyplot(points_hist_fig)
                 st.pyplot(guessed_loc_fig)
+                # Add my new plot here
+                st.pyplot(guessed_loc_fig_2)
 
         progress_bar.empty()
         
