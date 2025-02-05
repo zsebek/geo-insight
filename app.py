@@ -35,22 +35,10 @@ if ncfa:
         no_mov_stats = stats['no-moving']
         nmpz_stats = stats['nmpz']
 
-    # JSON printing (separate button, always visible)
-    if st.button("Print Game JSON (Caution: Large Output)"):  # Separate JSON printing button
-        if 'game_tokens' in locals(): #Check if game_tokens exists, if not, it will throw an error
-            game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(game_tokens) - 1, value=0)
-            try:
-                game_token = game_tokens[game_index]
-                game_data = session.get(f"{utils.BASE_URL_V3}/games/{game_token}").json()
-                st.write(json.dumps(game_data, indent=4))
-            except Exception as e:
-                st.error(f"Error fetching or displaying JSON: {e}")
-        else:
-            st.error("Please click 'Analyze' first to fetch game data.")
+        # Store game_tokens in session state AFTER analysis
+        st.session_state.game_tokens = game_tokens
 
 
-
-    #
 
         def plot_and_display_data(stats, label):
             # Extracting most and least stats for points and distances per country
@@ -101,3 +89,17 @@ if ncfa:
         plot_and_display_data(mov_stats, mov)
         plot_and_display_data(no_mov_stats, no_mov)
         plot_and_display_data(nmpz_stats, nmpz)
+
+
+    # JSON printing (separate button, always visible)
+    if st.button("Print Game JSON (Caution: Large Output)"):
+        if 'game_tokens' in st.session_state:
+            game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(st.session_state.game_tokens) - 1, value=0)
+            try:
+                game_token = st.session_state.game_tokens[game_index]
+                game_data = session.get(f"{utils.BASE_URL_V3}/games/{game_token}").json()
+                st.write(json.dumps(game_data, indent=4))  # json is now available
+            except Exception as e:
+                st.error(f"Error fetching or displaying JSON: {e}")
+        else:
+            st.error("Please click 'Analyze' first to fetch game data.")
