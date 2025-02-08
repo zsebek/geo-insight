@@ -559,24 +559,30 @@ def plot_points_vs_time(stats):
     return fig
 
 def get_most_and_least_data(stats, type):
-    key_mapping = {'points': {'stat_name': 'points_lost_per_country',
-                              'col_name': ['Country', 'Points Lost']},
-                   'distance': {'stat_name': 'distance_per_country',
-                                'col_name': ['Country', 'Total Distance (KM)']}}
-    
+    key_mapping = {
+        'points': {'stat_name': 'points_lost_per_country', 'col_name': ['Country', 'Points Lost']},
+        'distance': {'stat_name': 'distance_per_country', 'col_name': ['Country', 'Total Distance (KM)']},
+        'points_avg': {'stat_name': 'points_lost_per_country_avg', 'col_name': ['Country', 'Points Lost Average']},
+        'distance_avg': {'stat_name': 'distance_per_country_avg', 'col_name': ['Country', 'Total Distance Average']},
+    }
+
     stat_name = key_mapping[type]['stat_name']
     col_name = key_mapping[type]['col_name']
-    
-    top_n = 5 if len(stats) > 5 else len(stats)
-    desc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[:top_n]
-    asc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[-top_n:]
+
+    if stat_name not in stats or not stats[stat_name]: # Handles missing stats or empty stat data
+        return pd.DataFrame(columns=col_name), pd.DataFrame(columns=col_name)
+
+    top_n = 5 if len(stats[stat_name]) > 5 else len(stats[stat_name])
+
+    desc_per_country = sorted(stats[stat_name].items(), key=lambda x: x, reverse=True)[:top_n]
+    asc_per_country = sorted(stats[stat_name].items(), key=lambda x: x, reverse=True)[-top_n:]
 
     least_per_country = pd.DataFrame(asc_per_country, columns=col_name)
     most_per_country = pd.DataFrame(desc_per_country, columns=col_name)
-    
+
     most_per_country = country_code_to_name(most_per_country)
     least_per_country = country_code_to_name(least_per_country)
-    
+
     return most_per_country, least_per_country
 
 def points_histogram(stats):
