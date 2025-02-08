@@ -588,7 +588,7 @@ def get_most_and_least_data_avg(stats, type):
     stat_name = key_mapping[type]['stat_name']
     col_name = key_mapping[type]['col_name']
     
-    top_n = min(5, len(stats))  # More concise way to get the smaller of 5 or len(stats)
+    top_n = min(10, len(stats))  # More concise way to get the smaller of 5 or len(stats)
 
     desc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[:top_n]
     asc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1])[:top_n] 
