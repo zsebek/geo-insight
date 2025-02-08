@@ -389,6 +389,20 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                         mov_points_lost_per_country[country_code] += int(5000 - round_score)
                         mov_distance_per_country[country_code] += int(round_distance_km)
                         mov_countries[country_code] += 1
+                    # Calculate and store the averages *directly* within the loop:
+                    mov_points_lost_per_country_avg[country_code] = (
+                        mov_points_lost_per_country[country_code] / mov_countries[country_code]
+                        if mov_countries[country_code] > 0
+                        else 0
+                    )
+                    mov_distance_per_country_avg[country_code] = (
+                        mov_distance_per_country[country_code] / mov_countries[country_code]
+                        if mov_countries[country_code] > 0
+                        else 0
+                    )
+
+
+
                         
             elif game['forbidMoving'] and not game['forbidZooming'] and not game['forbidRotating']: # no-moving
                 no_mov_number_of_games += 1
@@ -415,6 +429,20 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                         no_mov_points_lost_per_country[country_code] += int(5000 - round_score)
                         no_mov_distance_per_country[country_code] += int(round_distance_km)
                         no_mov_countries[country_code] += 1
+                    # Calculate and store the averages *directly* within the loop:
+                    no_mov_points_lost_per_country_avg[country_code] = (
+                        no_mov_points_lost_per_country[country_code] / no_mov_countries[country_code]
+                        if no_mov_countries[country_code] > 0
+                        else 0
+                    )
+                    no_mov_distance_per_country_avg[country_code] = (
+                        no_mov_distance_per_country[country_code] / no_mov_countries[country_code]
+                        if no_mov_countries[country_code] > 0
+                        else 0
+                    )
+
+
+
                         
             elif game['forbidMoving'] and game['forbidZooming'] and game['forbidRotating']: # nmpz
                 
@@ -442,6 +470,17 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                         nmpz_points_lost_per_country[country_code] += int(5000 - round_score)
                         nmpz_distance_per_country[country_code] += int(round_distance_km)
                         nmpz_countries[country_code] += 1
+                    # Calculate and store the averages *directly* within the loop:
+                    nmpz_points_lost_per_country_avg[country_code] = (
+                        nmpz_points_lost_per_country[country_code] / nmpz_countries[country_code]
+                        if nmpz_countries[country_code] > 0
+                        else 0
+                    )
+                    nmpz_distance_per_country_avg[country_code] = (
+                        nmpz_distance_per_country[country_code] / nmpz_countries[country_code]
+                        if nmpz_countries[country_code] > 0
+                        else 0
+                    )
                         
         except Exception as e:
             continue
@@ -457,6 +496,8 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                    'round_wise_time': mov_round_wise_time,
                    'points_lost_per_country': mov_points_lost_per_country,
                    'distance_per_country': mov_distance_per_country,
+                   'points_lost_per_country_average': mov_points_lost_per_country_avg,  
+                   'distance_per_country_average': mov_distance_per_country_avg, 
                    'number_of_games': mov_number_of_games,
                    'number_of_rounds': mov_number_of_rounds,
                    'guessed_locations': mov_guessed_locations,
@@ -468,6 +509,8 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                       'round_wise_time': no_mov_round_wise_time,
                       'points_lost_per_country': no_mov_points_lost_per_country,
                       'distance_per_country': no_mov_distance_per_country,
+                      'points_lost_per_country_average': no_mov_points_lost_per_country_avg,  
+                      'distance_per_country_average': no_mov_distance_per_country_avg,
                       'number_of_games': no_mov_number_of_games,
                       'number_of_rounds': no_mov_number_of_rounds,
                       'guessed_locations': no_mov_guessed_locations,
@@ -479,6 +522,8 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                  'round_wise_time': nmpz_round_wise_time,
                  'points_lost_per_country': nmpz_points_lost_per_country,
                  'distance_per_country': nmpz_distance_per_country,
+                 'points_lost_per_country_average': nmpz_points_lost_per_country_avg, 
+                 'distance_per_country_average': nmpz_distance_per_country_avg, 
                  'number_of_games': nmpz_number_of_games,
                  'number_of_rounds': nmpz_number_of_rounds,
                  'guessed_locations': nmpz_guessed_locations,
