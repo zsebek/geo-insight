@@ -78,7 +78,7 @@ if ncfa:
                 col1, col2 = st.columns(2)
                 col1.dataframe(least_dist[::-1], hide_index=True)
                 col2.dataframe(most_dist, hide_index=True)
-                '''
+'''
                 st.write('Points lost per country Avg - Least vs Most')
                 col1, col2 = st.columns(2)
                 col1.dataframe(least_pts_avg[::-1], hide_index=True)
