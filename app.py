@@ -42,6 +42,9 @@ if ncfa:
 
 
         def plot_and_display_data(stats, label):
+            
+            st.text(json.dumps(stats, indent=4)) #Display the entire stats dictionary in Streamlit
+
             # Extracting most and least stats for points and distances per country
             most_pts, least_pts = utils.get_most_and_least_data(stats, type='points')
             most_dist, least_dist = utils.get_most_and_least_data(stats, type='distance')
