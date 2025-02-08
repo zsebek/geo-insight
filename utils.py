@@ -287,6 +287,28 @@ def get_game_tokens(session):
             break
     return game_tokens
 
+def get_game_tokens_other(session):
+    game_tokens = []
+    pagination_token = None
+    while True:
+        response = session.get(f"{BASE_URL_V4}/feed/private", params={'paginationToken': pagination_token})
+        pagination_token = entries = response.json()['paginationToken']
+        entries = response.json()['entries']
+        for entry in entries:
+            payload_json = json.loads(entry['payload'])
+            for payload in payload_json:
+                try:
+                    if payload['payload']['gameMode'] == 'Standard':
+                        game_tokens.append(payload['payload']['gameToken']) 
+                except Exception as e:
+                    continue 
+        if not pagination_token:
+            break
+    return game_tokens
+
+
+
+
 def get_stats(session, game_tokens, number_of_games, progress_bar):
     # moving stats
     mov_total_score = 0
@@ -300,6 +322,9 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     mov_countries = dict({})
     mov_number_of_games = 0
     mov_number_of_rounds = 0
+    # ZS New Stats
+    mov_points_lost_per_country_avg = dict({})
+    mov_distance_per_country_avg = dict({})    
     
     # no-moving stats
     no_mov_total_score = 0
@@ -313,7 +338,10 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     no_mov_countries = dict({})
     no_mov_number_of_games = 0
     no_mov_number_of_rounds = 0
-    
+    # ZS New Stats
+    no_mov_points_lost_per_country_avg = dict({})
+    no_mov_distance_per_country_avg = dict({})
+
     # nmpz stats
     nmpz_total_score = 0
     nmpz_total_distance_km = 0
@@ -326,6 +354,11 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     nmpz_countries = dict({})
     nmpz_number_of_games = 0
     nmpz_number_of_rounds = 0
+    # ZS New Stats
+    nmpz_points_lost_per_country_avg = dict({})
+    nmpz_distance_per_country_avg = dict({})
+
+
     
     for i, token in enumerate(game_tokens[:number_of_games]):
         try:
@@ -351,10 +384,14 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                     if country_code not in mov_points_lost_per_country:
                         mov_points_lost_per_country[country_code] = int(5000 - round_score)
                         mov_distance_per_country[country_code] = int(round_distance_km)
+                        mov_points_lost_per_country_avg[country_code] = int(5000 - round_score)
+                        mov_distance_per_country_avg[country_code] = int(round_distance_km)
                         mov_countries[country_code] = 1
                     else:
                         mov_points_lost_per_country[country_code] += int(5000 - round_score)
                         mov_distance_per_country[country_code] += int(round_distance_km)
+                        mov_points_lost_per_country_avg[country_code] += int(5000 - round_score)
+                        mov_distance_per_country_avg[country_code] += int(round_distance_km)
                         mov_countries[country_code] += 1
                         
             elif game['forbidMoving'] and not game['forbidZooming'] and not game['forbidRotating']: # no-moving
@@ -377,10 +414,14 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                     if country_code not in no_mov_points_lost_per_country:
                         no_mov_points_lost_per_country[country_code] = int(5000 - round_score)
                         no_mov_distance_per_country[country_code] = int(round_distance_km)
+                        no_mov_points_lost_per_country_avg[country_code] = int(5000 - round_score)
+                        no_mov_distance_per_country_avg[country_code] = int(round_distance_km)
                         no_mov_countries[country_code] = 1
                     else:
                         no_mov_points_lost_per_country[country_code] += int(5000 - round_score)
                         no_mov_distance_per_country[country_code] += int(round_distance_km)
+                        no_mov_points_lost_per_country_avg[country_code] += int(5000 - round_score)
+                        no_mov_distance_per_country_avg[country_code] += int(round_distance_km)
                         no_mov_countries[country_code] += 1
                         
             elif game['forbidMoving'] and game['forbidZooming'] and game['forbidRotating']: # nmpz
@@ -404,10 +445,14 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                     if country_code not in no_mov_points_lost_per_country:
                         nmpz_points_lost_per_country[country_code] = int(5000 - round_score)
                         nmpz_distance_per_country[country_code] = int(round_distance_km)
+                        nmpz_points_lost_per_country_avg[country_code] = int(5000 - round_score)
+                        nmpz_distance_per_country_avg[country_code] = int(round_distance_km)
                         nmpz_countries[country_code] = 1
                     else:
                         nmpz_points_lost_per_country[country_code] += int(5000 - round_score)
                         nmpz_distance_per_country[country_code] += int(round_distance_km)
+                        nmpz_points_lost_per_country_avg[country_code] += int(5000 - round_score)
+                        nmpz_distance_per_country_avg[country_code] += int(round_distance_km)
                         nmpz_countries[country_code] += 1
                         
         except Exception as e:
@@ -424,6 +469,8 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                    'round_wise_time': mov_round_wise_time,
                    'points_lost_per_country': mov_points_lost_per_country,
                    'distance_per_country': mov_distance_per_country,
+                   'points_lost_per_country_average': mov_points_lost_per_country_avg,
+                   'distance_per_country_average': mov_distance_per_country_avg,                        
                    'number_of_games': mov_number_of_games,
                    'number_of_rounds': mov_number_of_rounds,
                    'guessed_locations': mov_guessed_locations,
@@ -435,6 +482,8 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                       'round_wise_time': no_mov_round_wise_time,
                       'points_lost_per_country': no_mov_points_lost_per_country,
                       'distance_per_country': no_mov_distance_per_country,
+                      'points_lost_per_country_average': no_mov_points_lost_per_country_avg,
+                      'distance_per_country_average': no_mov_distance_per_country_avg,                      
                       'number_of_games': no_mov_number_of_games,
                       'number_of_rounds': no_mov_number_of_rounds,
                       'guessed_locations': no_mov_guessed_locations,
@@ -446,6 +495,8 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                  'round_wise_time': nmpz_round_wise_time,
                  'points_lost_per_country': nmpz_points_lost_per_country,
                  'distance_per_country': nmpz_distance_per_country,
+                 'points_lost_per_country_average': nmpz_points_lost_per_country_avg,
+                 'distance_per_country_average': nmpz_distance_per_country_avg,
                  'number_of_games': nmpz_number_of_games,
                  'number_of_rounds': nmpz_number_of_rounds,
                  'guessed_locations': nmpz_guessed_locations,
@@ -480,26 +531,36 @@ def plot_points_vs_time(stats):
     ax.grid(True, which='both', linestyle='--', linewidth=0.5)
     return fig
 
+import pandas as pd
+
 def get_most_and_least_data(stats, type):
-    key_mapping = {'points': {'stat_name': 'points_lost_per_country',
-                              'col_name': ['Country', 'Points Lost']},
-                   'distance': {'stat_name': 'distance_per_country',
-                                'col_name': ['Country', 'Total Distance (KM)']}}
+    key_mapping = {'points': {'stat_name': 'points_lost_per_country_avg',  # Changed to _avg
+                              'col_name': ['Country', 'Points Lost Average']}, # Changed col_name
+                   'distance': {'stat_name': 'distance_per_country_avg', # Changed to _avg
+                                'col_name': ['Country', 'Total Distance Average']}} # Changed col_name
     
     stat_name = key_mapping[type]['stat_name']
     col_name = key_mapping[type]['col_name']
     
-    top_n = 5 if len(stats) > 5 else len(stats)
-    desc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[:top_n]
-    asc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[-top_n:]
+    top_n = 10 if len(stats) > 10 else len(stats)
 
-    least_per_country = pd.DataFrame(asc_per_country, columns=col_name)
-    most_per_country = pd.DataFrame(desc_per_country, columns=col_name)
-    
-    most_per_country = country_code_to_name(most_per_country)
-    least_per_country = country_code_to_name(least_per_country)
-    
+    if stat_name in stats: # Handles missing stats
+        desc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[:top_n]
+        asc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[-top_n:]
+
+        least_per_country = pd.DataFrame(asc_per_country, columns=col_name)
+        most_per_country = pd.DataFrame(desc_per_country, columns=col_name)
+
+        most_per_country = country_code_to_name(most_per_country)
+        least_per_country = country_code_to_name(least_per_country)
+    else:
+        most_per_country = pd.DataFrame(columns=col_name)
+        least_per_country = pd.DataFrame(columns=col_name)
+
+
     return most_per_country, least_per_country
+
+# ... (rest of your code, including stats data and country_code_to_name)
 
 def points_histogram(stats):
 
