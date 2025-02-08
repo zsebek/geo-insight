@@ -580,9 +580,9 @@ def get_most_and_least_data(stats, type):
     return most_per_country, least_per_country
 
 def get_most_and_least_data_avg(stats, type):
-    key_mapping = {'points': {'stat_name': 'points_lost_per_country_avg',
+    key_mapping = {'points': {'stat_name': 'points_lost_per_country_average',
                               'col_name': ['Country', 'Points Lost Per Round Avg']},
-                   'distance': {'stat_name': 'distance_per_country_avg',
+                   'distance': {'stat_name': 'distance_per_country_average',
                                 'col_name': ['Country', 'Total Distance (KM) Per Round Avg']}}
     
     stat_name = key_mapping[type]['stat_name']
