@@ -45,10 +45,8 @@ if ncfa:
             # Extracting most and least stats for points and distances per country
             most_pts, least_pts = utils.get_most_and_least_data(stats, type='points')
             most_dist, least_dist = utils.get_most_and_least_data(stats, type='distance')
-            '''
             most_pts_avg, least_pts_avg = utils.get_most_and_least_data(stats, type='points_avg')
             most_dist_avg, least_dist_avg = utils.get_most_and_least_data(stats, type='distance_avg')
-            '''
 
             # Plotting figures
             points_vs_time_fig = utils.plot_points_vs_time(stats)
@@ -78,16 +76,17 @@ if ncfa:
                 col1, col2 = st.columns(2)
                 col1.dataframe(least_dist[::-1], hide_index=True)
                 col2.dataframe(most_dist, hide_index=True)
-'''
-                st.write('Points lost per country Avg - Least vs Most')
+
+                st.write('Points lost per country - Least vs Most')
                 col1, col2 = st.columns(2)
                 col1.dataframe(least_pts_avg[::-1], hide_index=True)
                 col2.dataframe(most_pts_avg, hide_index=True)
 
-                st.write('Distance per country Avg - Least vs Most')
+                st.write('Distance per country - Least vs Most')
                 col1, col2 = st.columns(2)
                 col1.dataframe(least_dist_avg[::-1], hide_index=True)
-                col2.dataframe(most_dist_avg, hide_index=True)'''
+                col2.dataframe(most_dist_avg, hide_index=True)
+
                 st.pyplot(countries_bar_fig)
                 st.pyplot(points_vs_time_fig)
                 st.pyplot(points_hist_fig)
