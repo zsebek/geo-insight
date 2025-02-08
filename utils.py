@@ -579,6 +579,30 @@ def get_most_and_least_data(stats, type):
     
     return most_per_country, least_per_country
 
+def get_most_and_least_data_avg(stats, type):
+    key_mapping = {'points': {'stat_name': 'points_lost_per_country_avg',
+                              'col_name': ['Country', 'Points Lost Per Round Avg']},
+                   'distance': {'stat_name': 'distance_per_country_avg',
+                                'col_name': ['Country', 'Total Distance (KM) Per Round Avg']}}
+    
+    stat_name = key_mapping[type]['stat_name']
+    col_name = key_mapping[type]['col_name']
+    
+    top_n = min(5, len(stats))  # More concise way to get the smaller of 5 or len(stats)
+
+    desc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1], reverse=True)[:top_n]
+    asc_per_country = sorted(stats[stat_name].items(), key=lambda x: x[1])[:top_n] 
+
+    least_per_country = pd.DataFrame(asc_per_country, columns=col_name)
+    most_per_country = pd.DataFrame(desc_per_country, columns=col_name)
+    
+    most_per_country = country_code_to_name(most_per_country) 
+    least_per_country = country_code_to_name(least_per_country) 
+    
+    return most_per_country, least_per_country
+
+
+
 def points_histogram(stats):
 
     buckets = [0, 1000, 2000, 3000, 4000, 5000]
