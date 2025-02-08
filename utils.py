@@ -363,125 +363,125 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     for i, token in enumerate(game_tokens[:number_of_games]):
         try:
             game = session.get(f"{BASE_URL_V3}/games/{token}").json() 
-            
-            if not game['forbidMoving'] and not game['forbidZooming'] and not game['forbidRotating']: # moving
-                mov_number_of_games += 1
-                mov_total_score += float(game['player']['totalScore']['amount'])
-                mov_total_time_sec += float(game['player']['totalTime'])
-                for actual, guess in zip(game['rounds'], game['player']['guesses']):
-                    mov_number_of_rounds += 1
-                    mov_round_wise_time.append(guess['time'])
-                    mov_round_wise_points.append(int(guess['roundScore']['amount'])) 
-                    
-                    country_code = actual['streakLocationCode']
-                    round_score = float(guess['roundScoreInPoints'])
-                    round_distance_km = float(guess['distance']['meters']['amount'])
-                    mov_total_distance_km += round_distance_km
-                    mov_guessed_locations.append({'lat': guess['lat'],
-                                                  'lng': guess['lng'],
-                                                  'score': guess['roundScoreInPoints']})
-                    
-                    if country_code not in mov_points_lost_per_country:
-                        mov_points_lost_per_country[country_code] = int(5000 - round_score)
-                        mov_distance_per_country[country_code] = int(round_distance_km)
-                        mov_countries[country_code] = 1
-                    else:
-                        mov_points_lost_per_country[country_code] += int(5000 - round_score)
-                        mov_distance_per_country[country_code] += int(round_distance_km)
-                        mov_countries[country_code] += 1
-                    # Calculate and store the averages *directly* within the loop:
-                    mov_points_lost_per_country_avg[country_code] = (
-                        mov_points_lost_per_country[country_code] / mov_countries[country_code]
-                        if mov_countries[country_code] > 0
-                        else 0
-                    )
-                    mov_distance_per_country_avg[country_code] = (
-                        mov_distance_per_country[country_code] / mov_countries[country_code]
-                        if mov_countries[country_code] > 0
-                        else 0
-                    )
-
-
-
+            if game.get("mapName") == "A Community World":
+                if not game['forbidMoving'] and not game['forbidZooming'] and not game['forbidRotating']: # moving
+                    mov_number_of_games += 1
+                    mov_total_score += float(game['player']['totalScore']['amount'])
+                    mov_total_time_sec += float(game['player']['totalTime'])
+                    for actual, guess in zip(game['rounds'], game['player']['guesses']):
+                        mov_number_of_rounds += 1
+                        mov_round_wise_time.append(guess['time'])
+                        mov_round_wise_points.append(int(guess['roundScore']['amount'])) 
                         
-            elif game['forbidMoving'] and not game['forbidZooming'] and not game['forbidRotating']: # no-moving
-                no_mov_number_of_games += 1
-                no_mov_total_score += float(game['player']['totalScore']['amount'])
-                no_mov_total_time_sec += float(game['player']['totalTime'])
-                for actual, guess in zip(game['rounds'], game['player']['guesses']):
-                    no_mov_number_of_rounds += 1
-                    no_mov_round_wise_time.append(guess['time'])
-                    no_mov_round_wise_points.append(int(guess['roundScore']['amount'])) 
-                    
-                    country_code = actual['streakLocationCode']
-                    round_score = float(guess['roundScoreInPoints'])
-                    round_distance_km = float(guess['distance']['meters']['amount'])
-                    no_mov_total_distance_km += round_distance_km
-                    no_mov_guessed_locations.append({'lat': guess['lat'],
-                                                     'lng': guess['lng'],
-                                                     'score': guess['roundScoreInPoints']})
-                    
-                    if country_code not in no_mov_points_lost_per_country:
-                        no_mov_points_lost_per_country[country_code] = int(5000 - round_score)
-                        no_mov_distance_per_country[country_code] = int(round_distance_km)
-                        no_mov_countries[country_code] = 1
-                    else:
-                        no_mov_points_lost_per_country[country_code] += int(5000 - round_score)
-                        no_mov_distance_per_country[country_code] += int(round_distance_km)
-                        no_mov_countries[country_code] += 1
-                    # Calculate and store the averages *directly* within the loop:
-                    no_mov_points_lost_per_country_avg[country_code] = (
-                        no_mov_points_lost_per_country[country_code] / no_mov_countries[country_code]
-                        if no_mov_countries[country_code] > 0
-                        else 0
-                    )
-                    no_mov_distance_per_country_avg[country_code] = (
-                        no_mov_distance_per_country[country_code] / no_mov_countries[country_code]
-                        if no_mov_countries[country_code] > 0
-                        else 0
-                    )
-
-
-
+                        country_code = actual['streakLocationCode']
+                        round_score = float(guess['roundScoreInPoints'])
+                        round_distance_km = float(guess['distance']['meters']['amount'])
+                        mov_total_distance_km += round_distance_km
+                        mov_guessed_locations.append({'lat': guess['lat'],
+                                                    'lng': guess['lng'],
+                                                    'score': guess['roundScoreInPoints']})
                         
-            elif game['forbidMoving'] and game['forbidZooming'] and game['forbidRotating']: # nmpz
-                
-                nmpz_number_of_games += 1
-                nmpz_total_score += float(game['player']['totalScore']['amount'])
-                nmpz_total_time_sec += float(game['player']['totalTime'])
-                for actual, guess in zip(game['rounds'], game['player']['guesses']):
-                    nmpz_number_of_rounds += 1
-                    nmpz_round_wise_time.append(guess['time'])
-                    nmpz_round_wise_points.append(int(guess['roundScore']['amount'])) 
-                    
-                    country_code = actual['streakLocationCode']
-                    round_score = float(guess['roundScoreInPoints'])
-                    round_distance_km = float(guess['distance']['meters']['amount'])
-                    nmpz_total_distance_km += round_distance_km
-                    nmpz_guessed_locations.append({'lat': guess['lat'],
-                                                   'lng': guess['lng'],
-                                                   'score': guess['roundScoreInPoints']})
-                    
-                    if country_code not in no_mov_points_lost_per_country:
-                        nmpz_points_lost_per_country[country_code] = int(5000 - round_score)
-                        nmpz_distance_per_country[country_code] = int(round_distance_km)
-                        nmpz_countries[country_code] = 1
-                    else:
-                        nmpz_points_lost_per_country[country_code] += int(5000 - round_score)
-                        nmpz_distance_per_country[country_code] += int(round_distance_km)
-                        nmpz_countries[country_code] += 1
-                    # Calculate and store the averages *directly* within the loop:
-                    nmpz_points_lost_per_country_avg[country_code] = (
-                        nmpz_points_lost_per_country[country_code] / nmpz_countries[country_code]
-                        if nmpz_countries[country_code] > 0
-                        else 0
-                    )
-                    nmpz_distance_per_country_avg[country_code] = (
-                        nmpz_distance_per_country[country_code] / nmpz_countries[country_code]
-                        if nmpz_countries[country_code] > 0
-                        else 0
-                    )
+                        if country_code not in mov_points_lost_per_country:
+                            mov_points_lost_per_country[country_code] = int(5000 - round_score)
+                            mov_distance_per_country[country_code] = int(round_distance_km)
+                            mov_countries[country_code] = 1
+                        else:
+                            mov_points_lost_per_country[country_code] += int(5000 - round_score)
+                            mov_distance_per_country[country_code] += int(round_distance_km)
+                            mov_countries[country_code] += 1
+                        # Calculate and store the averages *directly* within the loop:
+                        mov_points_lost_per_country_avg[country_code] = (
+                            mov_points_lost_per_country[country_code] / mov_countries[country_code]
+                            if mov_countries[country_code] > 0
+                            else 0
+                        )
+                        mov_distance_per_country_avg[country_code] = (
+                            mov_distance_per_country[country_code] / mov_countries[country_code]
+                            if mov_countries[country_code] > 0
+                            else 0
+                        )
+
+
+
+                            
+                elif game['forbidMoving'] and not game['forbidZooming'] and not game['forbidRotating']: # no-moving
+                    no_mov_number_of_games += 1
+                    no_mov_total_score += float(game['player']['totalScore']['amount'])
+                    no_mov_total_time_sec += float(game['player']['totalTime'])
+                    for actual, guess in zip(game['rounds'], game['player']['guesses']):
+                        no_mov_number_of_rounds += 1
+                        no_mov_round_wise_time.append(guess['time'])
+                        no_mov_round_wise_points.append(int(guess['roundScore']['amount'])) 
                         
+                        country_code = actual['streakLocationCode']
+                        round_score = float(guess['roundScoreInPoints'])
+                        round_distance_km = float(guess['distance']['meters']['amount'])
+                        no_mov_total_distance_km += round_distance_km
+                        no_mov_guessed_locations.append({'lat': guess['lat'],
+                                                        'lng': guess['lng'],
+                                                        'score': guess['roundScoreInPoints']})
+                        
+                        if country_code not in no_mov_points_lost_per_country:
+                            no_mov_points_lost_per_country[country_code] = int(5000 - round_score)
+                            no_mov_distance_per_country[country_code] = int(round_distance_km)
+                            no_mov_countries[country_code] = 1
+                        else:
+                            no_mov_points_lost_per_country[country_code] += int(5000 - round_score)
+                            no_mov_distance_per_country[country_code] += int(round_distance_km)
+                            no_mov_countries[country_code] += 1
+                        # Calculate and store the averages *directly* within the loop:
+                        no_mov_points_lost_per_country_avg[country_code] = (
+                            no_mov_points_lost_per_country[country_code] / no_mov_countries[country_code]
+                            if no_mov_countries[country_code] > 0
+                            else 0
+                        )
+                        no_mov_distance_per_country_avg[country_code] = (
+                            no_mov_distance_per_country[country_code] / no_mov_countries[country_code]
+                            if no_mov_countries[country_code] > 0
+                            else 0
+                        )
+
+
+
+                            
+                elif game['forbidMoving'] and game['forbidZooming'] and game['forbidRotating']: # nmpz
+                    
+                    nmpz_number_of_games += 1
+                    nmpz_total_score += float(game['player']['totalScore']['amount'])
+                    nmpz_total_time_sec += float(game['player']['totalTime'])
+                    for actual, guess in zip(game['rounds'], game['player']['guesses']):
+                        nmpz_number_of_rounds += 1
+                        nmpz_round_wise_time.append(guess['time'])
+                        nmpz_round_wise_points.append(int(guess['roundScore']['amount'])) 
+                        
+                        country_code = actual['streakLocationCode']
+                        round_score = float(guess['roundScoreInPoints'])
+                        round_distance_km = float(guess['distance']['meters']['amount'])
+                        nmpz_total_distance_km += round_distance_km
+                        nmpz_guessed_locations.append({'lat': guess['lat'],
+                                                    'lng': guess['lng'],
+                                                    'score': guess['roundScoreInPoints']})
+                        
+                        if country_code not in no_mov_points_lost_per_country:
+                            nmpz_points_lost_per_country[country_code] = int(5000 - round_score)
+                            nmpz_distance_per_country[country_code] = int(round_distance_km)
+                            nmpz_countries[country_code] = 1
+                        else:
+                            nmpz_points_lost_per_country[country_code] += int(5000 - round_score)
+                            nmpz_distance_per_country[country_code] += int(round_distance_km)
+                            nmpz_countries[country_code] += 1
+                        # Calculate and store the averages *directly* within the loop:
+                        nmpz_points_lost_per_country_avg[country_code] = (
+                            nmpz_points_lost_per_country[country_code] / nmpz_countries[country_code]
+                            if nmpz_countries[country_code] > 0
+                            else 0
+                        )
+                        nmpz_distance_per_country_avg[country_code] = (
+                            nmpz_distance_per_country[country_code] / nmpz_countries[country_code]
+                            if nmpz_countries[country_code] > 0
+                            else 0
+                        )
+                            
         except Exception as e:
             continue
         finally:
