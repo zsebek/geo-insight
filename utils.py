@@ -699,6 +699,29 @@ def plot_guessed_locations(guessed_locations):
     fig.colorbar(sm, cax=cax, orientation='horizontal', label='Score')
     return fig
 
+def plot_round_locations(guessed_locations):
+    round_lat = []
+    round_lng = []
+
+    for guessed_loc in guessed_locations:
+        round_lat.append(guessed_loc['lat'])
+        round_lng.append(guessed_loc['lng'])
+
+    round_df = pd.DataFrame({'lat': round_lat,
+                               'lng': round_lng})
+
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+    round_geometry = [Point(xy) for xy in zip(round_df['lng'], round_df['lat'])]
+    round_gdf = GeoDataFrame(round_df, geometry=round_geometry)
+
+    ax = round_gdf.plot(ax=world.plot(figsize=(10,10), color='lightblue'), marker='o', markersize=3, color='red')
+
+    ax.set_title('Round Locations')
+    ax.set_axis_off()
+
+    return ax.get_figure()
+
 def plot_guessed_locations_2(guessed_locations):
     guessed_lat = []
     guessed_lng = []
