@@ -317,6 +317,7 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     mov_round_wise_points = []
     mov_round_wise_time = []
     mov_guessed_locations = []
+    mov_round_locations = []
     mov_points_lost_per_country = dict({})
     mov_distance_per_country = dict({})
     mov_countries = dict({})
@@ -333,6 +334,7 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     no_mov_round_wise_points = []
     no_mov_round_wise_time = []
     no_mov_guessed_locations = []
+    no_mov_round_locations = []
     no_mov_points_lost_per_country = dict({})
     no_mov_distance_per_country = dict({})
     no_mov_countries = dict({})
@@ -349,6 +351,7 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
     nmpz_round_wise_points = []
     nmpz_round_wise_time = []
     nmpz_guessed_locations = []
+    nmpz_round_locations = []
     nmpz_points_lost_per_country = dict({})
     nmpz_distance_per_country = dict({})
     nmpz_countries = dict({})
@@ -368,6 +371,13 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                     mov_number_of_games += 1
                     mov_total_score += float(game['player']['totalScore']['amount'])
                     mov_total_time_sec += float(game['player']['totalTime'])
+                    # ZS: Looking to pull in Round Location data, append to mov_round_locations
+                    for actual in game['rounds']:  # Iterate directly through rounds
+                        mov_round_locations.append({
+                            'lat': actual['lat'],
+                            'lng': actual['lng'],
+                            'country_code': actual['streakLocationCode']
+                        })
                     for actual, guess in zip(game['rounds'], game['player']['guesses']):
                         mov_number_of_rounds += 1
                         mov_round_wise_time.append(guess['time'])
@@ -408,6 +418,13 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                     no_mov_number_of_games += 1
                     no_mov_total_score += float(game['player']['totalScore']['amount'])
                     no_mov_total_time_sec += float(game['player']['totalTime'])
+                    # ZS: Looking to pull in Round Location data, append to mov_round_locations
+                    for actual in game['rounds']:  # Iterate directly through rounds
+                        no_mov_round_locations.append({
+                            'lat': actual['lat'],
+                            'lng': actual['lng'],
+                            'country_code': actual['streakLocationCode']
+                        })
                     for actual, guess in zip(game['rounds'], game['player']['guesses']):
                         no_mov_number_of_rounds += 1
                         no_mov_round_wise_time.append(guess['time'])
@@ -449,6 +466,13 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                     nmpz_number_of_games += 1
                     nmpz_total_score += float(game['player']['totalScore']['amount'])
                     nmpz_total_time_sec += float(game['player']['totalTime'])
+                    # ZS: Looking to pull in Round Location data, append to mov_round_locations
+                    for actual in game['rounds']:  # Iterate directly through rounds
+                        nmpz_round_locations.append({
+                            'lat': actual['lat'],
+                            'lng': actual['lng'],
+                            'country_code': actual['streakLocationCode']
+                        })
                     for actual, guess in zip(game['rounds'], game['player']['guesses']):
                         nmpz_number_of_rounds += 1
                         nmpz_round_wise_time.append(guess['time'])
@@ -501,6 +525,7 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                    'number_of_games': mov_number_of_games,
                    'number_of_rounds': mov_number_of_rounds,
                    'guessed_locations': mov_guessed_locations,
+                   'round_locations': mov_round_locations,                   
                    'countries': mov_countries},
         'no-moving': {'average_score': int(no_mov_total_score/no_mov_number_of_games) if no_mov_number_of_games else 0,
                       'average_distance': int(no_mov_total_distance_km/no_mov_number_of_games) if no_mov_number_of_games else 0,
@@ -514,6 +539,7 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                       'number_of_games': no_mov_number_of_games,
                       'number_of_rounds': no_mov_number_of_rounds,
                       'guessed_locations': no_mov_guessed_locations,
+                      'round_locations': no_mov_round_locations,
                       'countries': no_mov_countries},
         'nmpz': {'average_score': int(nmpz_total_score/nmpz_number_of_games) if nmpz_number_of_games else 0,
                  'average_distance': int(nmpz_total_distance_km/nmpz_number_of_games) if nmpz_number_of_games else 0,
@@ -527,6 +553,7 @@ def get_stats(session, game_tokens, number_of_games, progress_bar):
                  'number_of_games': nmpz_number_of_games,
                  'number_of_rounds': nmpz_number_of_rounds,
                  'guessed_locations': nmpz_guessed_locations,
+                 'round_locations': nmpz_round_locations,
                  'countries': nmpz_countries}
     }  
 
