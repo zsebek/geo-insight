@@ -85,7 +85,7 @@ if ncfa:
                 st.pyplot(guessed_loc_fig)
                 # Add my new plot here
                 st.pyplot(guessed_loc_fig_2)
-                #st.pyplot(round_loc_fig)
+                st.pyplot(round_loc_fig)
 
         progress_bar.empty()
         
