@@ -56,7 +56,7 @@ if ncfa:
             guessed_loc_fig = utils.plot_guessed_locations(stats['guessed_locations'])
             # Add my new plots here
             guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
-            #round_loc_fig = utils.plot_round_locations(stats['round_locations'])
+            round_loc_fig = utils.plot_round_locations(stats['round_locations'])
 
             # Displaying data and figures in the corresponding tab
             with label:
