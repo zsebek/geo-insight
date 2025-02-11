@@ -858,13 +858,14 @@ def create_interactive_map(round_locations, guessed_locations):
             icon=folium.Icon(color='red', icon='question-sign')
         ).add_to(guessed_marker_cluster)
 
-    # Add lines connecting round and guessed locations
+    # Add lines connecting round and guessed locations (thin, black, dotted)
     for round_loc, guessed_loc in zip(round_locations, guessed_locations):
         folium.PolyLine(
             locations=[[round_loc['lat'], round_loc['lng']], [guessed_loc['lat'], guessed_loc['lng']]],
-            color='blue',
-            weight=2.5,
-            opacity=1
+            color='black',       #  Change color to black
+            weight=1.5,          # Decrease weight
+            opacity=1,
+            dash_array='5'       # dotted line 
         ).add_to(m)
 
     return m
