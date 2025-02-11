@@ -6,6 +6,8 @@ import numpy as np
 from shapely.geometry import Point, LineString
 import geopandas as gpd
 from geopandas import GeoDataFrame
+import folium
+from folium.plugins import MarkerCluster
 
 BASE_URL_V4 = "https://www.geoguessr.com/api/v4"
 BASE_URL_V3 = "https://www.geoguessr.com/api/v3"
@@ -819,6 +821,53 @@ def plot_round_and_guessed_locations(round_locations, guessed_locations):
     return ax.get_figure()
 
 
+def create_interactive_map(round_locations, guessed_locations):
+    """
+    Creates an interactive map with round locations and guessed locations,
+    connected by lines.
+
+    Args:
+        round_locations: List of dictionaries, where each dictionary
+                         represents a round location and has 'lat' and 'lng' keys.
+        guessed_locations: List of dictionaries, where each dictionary
+                           represents a guessed location and has 'lat', 'lng',
+                           and 'score' keys.
+    Returns:
+        A folium Map object.
+    """
+
+    # Create a map centered on the first round location
+    map_center = [round_locations['lat'], round_locations['lng']]
+    m = folium.Map(location=map_center, zoom_start=3)
+
+    # Add round locations as green markers
+    round_marker_cluster = MarkerCluster().add_to(m)
+    for round_loc in round_locations:
+        folium.Marker(
+            location=[round_loc['lat'], round_loc['lng']],
+            popup=f"Round Location\nLatitude: {round_loc['lat']:.4f}\nLongitude: {round_loc['lng']:.4f}",
+            icon=folium.Icon(color='gray', icon='info-sign')
+        ).add_to(round_marker_cluster)
+
+    # Add guessed locations as red markers with popups showing the score
+    guessed_marker_cluster = MarkerCluster().add_to(m)
+    for guessed_loc in guessed_locations:
+        folium.Marker(
+            location=[guessed_loc['lat'], guessed_loc['lng']],
+            popup=f"Guessed Location\nLatitude: {guessed_loc['lat']:.4f}\nLongitude: {guessed_loc['lng']:.4f}\nScore: {guessed_loc['score']}",
+            icon=folium.Icon(color='red', icon='question-sign')
+        ).add_to(guessed_marker_cluster)
+
+    # Add lines connecting round and guessed locations
+    for round_loc, guessed_loc in zip(round_locations, guessed_locations):
+        folium.PolyLine(
+            locations=[[round_loc['lat'], round_loc['lng']], [guessed_loc['lat'], guessed_loc['lng']]],
+            color='blue',
+            weight=2.5,
+            opacity=1
+        ).add_to(m)
+
+    return m
 
 
 # Printing the game function

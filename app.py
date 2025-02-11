@@ -58,6 +58,8 @@ if ncfa:
             guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
             round_loc_fig = utils.plot_round_locations(stats['round_locations'])
             round_and_guess_fig = utils.plot_round_and_guessed_locations(stats['round_locations'], stats['guessed_locations'])
+            # After getting the stats
+            interactive_map = utils.create_interactive_map(stats['round_locations'], stats['guessed_locations'])
 
             # Displaying data and figures in the corresponding tab
             with label:
@@ -88,6 +90,8 @@ if ncfa:
                 st.pyplot(guessed_loc_fig_2)
                 st.pyplot(round_loc_fig)
                 st.pyplot(round_and_guess_fig)
+                # Display the map in Streamlit
+                st.components.v1.html(interactive_map._repr_html_(), width=800, height=600)
 
 
         progress_bar.empty()
