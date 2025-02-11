@@ -3,7 +3,7 @@ import json
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from shapely.geometry import Point
+from shapely.geometry import Point, LineString
 import geopandas as gpd
 from geopandas import GeoDataFrame
 
