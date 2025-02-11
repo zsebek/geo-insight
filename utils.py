@@ -863,8 +863,8 @@ def create_interactive_map(round_locations, guessed_locations):
         folium.PolyLine(
             locations=[[round_loc['lat'], round_loc['lng']], [guessed_loc['lat'], guessed_loc['lng']]],
             color='black',       #  Change color to black
-            weight=1.5,          # Decrease weight
-            opacity=1,
+            weight=1,          # Decrease weight
+            opacity=2,
             dash_array='5'       # dotted line 
         ).add_to(m)
 
