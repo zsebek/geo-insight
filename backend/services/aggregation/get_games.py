@@ -1,10 +1,12 @@
 import json
 from config.api_urls import BASE_URL_V4
-
-def get_game_tokens(session):
+from services.auth.session_manager import SessionManager
+import requests
+def get_game_tokens():
     game_tokens = []
     pagination_token = None
     while True:
+        session = SessionManager.get_session()
         response = session.get(f"{BASE_URL_V4}/feed/private", params={'paginationToken': pagination_token})
         pagination_token = entries = response.json()['paginationToken']
         entries = response.json()['entries']
