@@ -845,7 +845,8 @@ def create_interactive_map(round_locations, guessed_locations):
 
 
     # Use custom image icons
-    round_icon = folium.features.CustomIcon('images/GeoGuessr-Pin.png', icon_size=(32, 32))  # Path to image
+    round_icon = folium.features.CustomIcon('/Users/zachsebek/Documents/GitHub/geo-insight-zach/images/GeoGuessr-Pin.png', icon_size=(32, 32))
+    #round_icon = folium.features.CustomIcon('images/GeoGuessr-Pin.png', icon_size=(32, 32))  # Path to image
     guessed_icon = folium.Icon(color='red', icon='question-sign')  # You can keep the default guessed_icon or use another image
 
     # Add round locations as custom marker
