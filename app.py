@@ -59,7 +59,7 @@ if ncfa:
             round_loc_fig = utils.plot_round_locations(stats['round_locations'])
             round_and_guess_fig = utils.plot_round_and_guessed_locations(stats['round_locations'], stats['guessed_locations'])
             # After getting the stats
-            interactive_map = utils.create_interactive_map(stats['round_locations'], stats['guessed_locations'])
+            interactive_map = utils.create_interactive_map_custom_markers(stats['round_locations'], stats['guessed_locations'])
 
             # Displaying data and figures in the corresponding tab
             with label:
