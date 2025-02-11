@@ -4,12 +4,12 @@ import pandas as pd
 import utils
 import json
 
-st.title('GeoInsight')
+st.title('GeoCoach')
 st.write('''
-GeoInsight is your ultimate companion for dissecting and understanding your GeoGuessr gameplay.
-Dive into detailed analyses of your guesses, uncover patterns in your play style, 
-and enhance your skills with valuable insights.
-Explore your GeoGuessr games like never before!''')
+GeoCoach is a one-stop shop for improving your GeoGuessr performance and visualizing your gameplay at scale.
+It surfaces insights that aren't possible in GeoGuessr's Game Breakdowns & Recaps, and generates 
+interactive maps showing you how you've explored the world and what you've learned over time. Identify
+your weaknesses & strengths, or just stop by to enjoy your unique data visualized!''')
 st.divider()
 
 ncfa_guide_url = 'https://github.com/SafwanSipai/geo-insight?tab=readme-ov-file#getting-your-_ncfa-cookie'
@@ -53,10 +53,10 @@ if ncfa:
             points_vs_time_fig = utils.plot_points_vs_time(stats)
             points_hist_fig = utils.points_histogram(stats)
             countries_bar_fig = utils.plot_countries_bar_chart(stats)
-            guessed_loc_fig = utils.plot_guessed_locations(stats['guessed_locations'])
+            #guessed_loc_fig = utils.plot_guessed_locations(stats['guessed_locations'])
             # Add my new plots here
-            guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
-            round_loc_fig = utils.plot_round_locations(stats['round_locations'])
+            #guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
+            #round_loc_fig = utils.plot_round_locations(stats['round_locations'])
             round_and_guess_fig = utils.plot_round_and_guessed_locations(stats['round_locations'], stats['guessed_locations'])
             # After getting the stats
             interactive_map = utils.create_interactive_map(stats['round_locations'], stats['guessed_locations'])
@@ -85,13 +85,13 @@ if ncfa:
                 st.pyplot(countries_bar_fig)
                 st.pyplot(points_vs_time_fig)
                 st.pyplot(points_hist_fig)
-                st.pyplot(guessed_loc_fig)
+                #st.pyplot(guessed_loc_fig)
                 # Add my new plot here
-                st.pyplot(guessed_loc_fig_2)
-                st.pyplot(round_loc_fig)
+                #st.pyplot(guessed_loc_fig_2)
+                #st.pyplot(round_loc_fig)
                 st.pyplot(round_and_guess_fig)
                 # Display the map in Streamlit
-                st.components.v1.html(interactive_map._repr_html_(), width=800, height=600)
+                st.components.v1.html(interactive_map._repr_html_(), width=1000, height=800)
 
 
         progress_bar.empty()
