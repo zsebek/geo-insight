@@ -820,8 +820,60 @@ def plot_round_and_guessed_locations(round_locations, guessed_locations):
 
     return ax.get_figure()
 
+Python
+import folium
+from folium.plugins import MarkerCluster
 
 def create_interactive_map(round_locations, guessed_locations):
+    """
+    Creates an interactive map with round locations and guessed locations,
+    connected by thin, black dotted lines, centered on Boston.
+
+    Args:
+        round_locations: List of dictionaries, where each dictionary
+                         represents a round location and has 'lat' and 'lng' keys.
+        guessed_locations: List of dictionaries, where each dictionary
+                           represents a guessed location and has 'lat', 'lng',
+                           and 'score' keys.
+    Returns:
+        A folium Map object.
+    """
+
+    # Center the map on Boston
+    map_center = [42.3601, -71.0589]  
+    m = folium.Map(location=map_center, zoom_start=3)
+
+    # Add round locations as green markers
+    round_marker_cluster = MarkerCluster().add_to(m)
+    for round_loc in round_locations:
+        folium.Marker(
+            location=[round_loc['lat'], round_loc['lng']],
+            popup=f"Round Location\nLatitude: {round_loc['lat']:.4f}\nLongitude: {round_loc['lng']:.4f}",
+            icon=folium.Icon(color='green', icon='info-sign')
+        ).add_to(round_marker_cluster)
+
+    # Add guessed locations as red markers with popups showing the score
+    guessed_marker_cluster = MarkerCluster().add_to(m)
+    for guessed_loc in guessed_locations:
+        folium.Marker(
+            location=[guessed_loc['lat'], guessed_loc['lng']],
+            popup=f"Guessed Location\nLatitude: {guessed_loc['lat']:.4f}\nLongitude: {guessed_loc['lng']:.4f}\nScore: {guessed_loc['score']}",
+            icon=folium.Icon(color='red', icon='question-sign')
+        ).add_to(guessed_marker_cluster)
+
+    # Add lines connecting round and guessed locations (thin, black, dotted)
+    for round_loc, guessed_loc in zip(round_locations, guessed_locations):
+        folium.PolyLine(
+            locations=[[round_loc['lat'], round_loc['lng']], [guessed_loc['lat'], guessed_loc['lng']]],
+            color='black',        # <--- Change color to black
+            weight=1,          # <--- Decrease weight
+            opacity=1,
+            dash_array='5'       # <--- Make the line dotted
+        ).add_to(m)
+
+    return m
+
+def create_interactive_map_custom_markers(round_locations, guessed_locations):
     """
     Creates an interactive map with round locations and guessed locations,
     connected by lines.
