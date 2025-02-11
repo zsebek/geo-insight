@@ -836,8 +836,8 @@ def create_interactive_map(round_locations, guessed_locations):
         A folium Map object.
     """
 
-    # Create a map centered on the first round location
-    map_center = [round_locations['lat'], round_locations['lng']]
+    # Center the map on Boston
+    map_center = [42.3601, -71.0589]  
     m = folium.Map(location=map_center, zoom_start=3)
 
     # Add round locations as green markers
