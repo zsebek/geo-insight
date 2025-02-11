@@ -911,7 +911,7 @@ def create_interactive_map_custom_markers(round_locations, guessed_locations):
         folium.Marker(
             location=[guessed_loc['lat'], guessed_loc['lng']],
             popup=f"Guessed Location\nLatitude: {guessed_loc['lat']:.4f}\nLongitude: {guessed_loc['lng']:.4f}\nScore: {guessed_loc['score']}",
-            icon=guessed_icon  # Use the guessed_icon here
+            icon=folium.Icon(color='red', icon='question-sign')
         ).add_to(guessed_marker_cluster)
 
     # Add lines connecting round and guessed locations (thin, black, dotted)
