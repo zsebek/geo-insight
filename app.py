@@ -57,6 +57,7 @@ if ncfa:
             # Add my new plots here
             guessed_loc_fig_2 = utils.plot_guessed_locations_2(stats['guessed_locations'])
             round_loc_fig = utils.plot_round_locations(stats['round_locations'])
+            round_and_guess_fig = utils.plot_round_and_guessed_locations(stats['round_locations'], stats['guessed_locations'])
 
             # Displaying data and figures in the corresponding tab
             with label:
@@ -86,6 +87,8 @@ if ncfa:
                 # Add my new plot here
                 st.pyplot(guessed_loc_fig_2)
                 st.pyplot(round_loc_fig)
+                st.pyplot(round_and_guess_fig)
+
 
         progress_bar.empty()
         

@@ -758,6 +758,58 @@ def plot_guessed_locations_2(guessed_locations):
     ax.legend() #legend added
     return fig
 
+def plot_round_and_guessed_locations(round_locations, guessed_locations):
+    round_lat = [] 
+    round_lng = []
+    guessed_lat = []
+    guessed_lng = []
+    round_scores =  [] # If you still want scores for guessed locations
+
+    # Extract data
+    for round_loc in round_locations:
+        round_lat.append(round_loc['lat'])
+        round_lng.append(round_loc['lng'])
+
+    for guessed_loc in guessed_locations:
+        guessed_lat.append(guessed_loc['lat'])
+        guessed_lng.append(guessed_loc['lng'])
+        if 'score' in guessed_loc:  # only add the score if it exists
+            round_scores.append(guessed_loc['score'])
+
+    # Create DataFrames
+    round_df = pd.DataFrame({'lat': round_lat, 'lng': round_lng})
+    guessed_df = pd.DataFrame({'lat': guessed_lat, 'lng': guessed_lng})
+    if round_scores:  # only add score column if it exists
+        guessed_df['score'] = round_scores
+
+    # Create GeoDataFrames
+    world = gpd.read_file(gpd.datasets.get_path('naturalearth_lowres'))
+
+    round_geometry = [Point(xy) for xy in zip(round_df['lng'], round_df['lat'])]
+    round_gdf = GeoDataFrame(round_df, geometry=round_geometry, crs=world.crs)  # Added CRS
+
+    guessed_geometry = [Point(xy) for xy in zip(guessed_df['lng'], guessed_df['lat'])]
+    guessed_gdf = GeoDataFrame(guessed_df, geometry=guessed_geometry, crs=world.crs)  # Added CRS
+
+    # Create lines (connecting round and guessed locations)
+    lines = [] # <--- CRUCIAL: Initialize to empty list
+    for i in range(min(len(round_gdf), len(guessed_gdf))):  # handle cases where the lengths are different
+        line = LineString([round_gdf.geometry[i], guessed_gdf.geometry[i]])
+        lines.append(line)
+    lines_gdf = GeoDataFrame({'geometry': lines}, crs=world.crs)  # Added CRS
+
+    # Plotting
+    ax = world.plot(figsize=(10, 10), color='lightblue')  # Plot world map first
+    lines_gdf.plot(ax=ax, color='gray', linewidth=0.5)  # Plot lines
+    round_gdf.plot(ax=ax, color='green', marker='o', markersize=3, label='Round Locations')  # Plot round locations
+    guessed_gdf.plot(ax=ax, color='red', marker='x', markersize=3, label='Guessed Locations')  # Plot guessed locations
+
+    ax.set_title('Round and Guessed Locations')
+    ax.set_axis_off()
+    ax.legend()  # Show legend
+
+    return ax.get_figure()
+
 
 
 
