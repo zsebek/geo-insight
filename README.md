@@ -1,3 +1,100 @@
+
+project-name/
+│-- backend/               # Backend API and visualization logic
+│   │-- models/            # Database models
+│   │-- routes/            # API endpoints
+│   │-- services/          # Business logic for visualizations
+│   └── main.py            # Entry point (FastAPI) or manage.py (Django)
+│
+│-- frontend/              # Frontend code (if applicable)
+│-- scripts/               # Utility scripts
+│-- README.md              # Documentation
+
+# Backend Visualization Development Guide (For Zach)
+1. Getting Started
+1.1. Install Required Software
+Ensure you have:
+
+VSCode (with the Python extension)
+Python 3.8+ (Check with python --version)
+pip & virtualenv (Check with pip --version)
+Matplotlib, Pandas, NumPy (for visualization)
+1.2. Set Up the Project in VSCode
+Clone the Repository
+
+
+git clone https://github.com/your-org/project-name.git
+cd project-name
+Open the Project in VSCode
+You will mainly work inside backend/visualizations/.
+
+2.1. Writing your analysis
+cd backend/visualizations/
+touch zach_plot.py
+Example zach_plot.py:
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Pull in some sample data
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+# Create the plot
+plt.figure(figsize=(8, 5))
+plt.plot(x, y, label="Sine Wave")
+plt.xlabel("X Axis")
+plt.ylabel("Y Axis")
+plt.title("Sample Visualization")
+plt.legend()
+plt.grid()
+
+# Save the plot
+plt.savefig("output.png")
+plt.show()
+
+
+Run the script in VSCode Terminal:
+python zach_plot.py
+This will generate output.png.
+
+3. Viewing and Debugging Plots in VSCode
+Install the Python extension in VSCode.
+Use the interactive window to run Python code and see live plots.
+Open output.png in VSCode to check results.
+4. Next Steps: Converting to an API
+Once you're happy with your visualization:
+
+I'll help turn your script into a backend API.
+We’ll model the data and integrate it into the frontend.
+
+git checkout -b zach-visualization
+git add backend/visualizations/zach_plot.py
+git commit -m "Initial visualization script"
+git push origin zach-visualization
+
+
+
+# Creating API Endpoints
+from fastapi import APIRouter
+from backend.services.visualization_service import generate_chart_data
+
+router = APIRouter()
+
+@router.get("/visualizations/{chart_type}")
+async def get_chart_data(chart_type: str):
+    return generate_chart_data(chart_type)
+
+
+Implement the logic in backend/services/visualization_service.py:\
+def generate_chart_data(chart_type):
+    if chart_type == "bar":
+        return {"labels": ["A", "B", "C"], "values": [10, 20, 30]}
+    elif chart_type == "line":
+        return {"points": [1, 2, 3, 4, 5], "values": [5, 10, 15, 20, 25]}
+    else:
+        return {"error": "Unknown chart type"}
+
+
 # GeoInsight
 
 GeoInsight is a web application that analyses your GeoGuessr games and provides you with metrics and 

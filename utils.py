@@ -6,7 +6,7 @@ import numpy as np
 from shapely.geometry import Point, LineString
 import geopandas as gpd
 from geopandas import GeoDataFrame
-from backend.config import country_codes
+from backend.config import country_codes, BASE_URL_V3
 
 def country_code_to_name(df):
     def get_country_name(code):
