@@ -6,3 +6,4 @@ Requests
 Shapely
 streamlit
 fastapi
+uvicorn

@@ -1,5 +1,5 @@
 import json
-from config import BASE_URL_V4
+from config.api_urls import BASE_URL_V4
 
 def get_game_tokens(session):
     game_tokens = []

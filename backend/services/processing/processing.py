@@ -1,7 +1,7 @@
 from services.processing.game_stats import compute_game_stats
 from services.processing.country_metrics import update_country_metrics, calculate_average_metrics
 from services.processing.round_analysis import process_rounds
-from geoguessr import get_game_tokens
+from backend.services.auth.login import get_game_tokens
 
 def calculate_game_stats(ncfa, num_games):
     """Master function that delegates to smaller processing modules."""

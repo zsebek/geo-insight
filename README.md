@@ -1,5 +1,37 @@
+launch backend with
+uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+launch frontend with
+streamlit run .\main.py
+
+- add root dir for manual debugging
+
+https://github.com/EvickaStudio/GeoGuessr-API
 
 project-name/
+
+
+Keys go in J_COOKIE = "9RdYNUrRX
+
+Launch.json for backend
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Backend CurFile",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "cwd": "${workspaceFolder}/backend",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/backend"
+            },
+            "console": "integratedTerminal"
+        }
+    ]
+}
+
+
+
 │-- backend/               # Backend API and visualization logic
 │   │-- models/            # Database models
 │   │-- routes/            # API endpoints

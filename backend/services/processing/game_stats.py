@@ -1,5 +1,5 @@
 from typing import List, Dict
-from models import GameStats
+from models.stats import GameStats
 
 def compute_game_stats(game_data: List[Dict]) -> GameStats:
     """Compute aggregated game statistics from raw game data."""

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from services.plotting import plot_points_vs_time
+from services.visualization.plotting import plot_points_vs_time
 import io
 from fastapi.responses import StreamingResponse
 

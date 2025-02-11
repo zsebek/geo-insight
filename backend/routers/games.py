@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends
-import requests
-from services.geoguessr import get_game_tokens
+from fastapi import APIRouter
+from services.aggregation.get_games import get_game_tokens
 
 router = APIRouter()
 
