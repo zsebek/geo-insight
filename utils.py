@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 import matplotlib.pyplot as plt
@@ -885,17 +886,14 @@ def create_interactive_map_custom_markers(round_locations, guessed_locations):
         A folium Map object.
     """
 
-    import os
-    print("Current working directory:", os.getcwd()) 
-
     # Center the map on Boston
     map_center = [42.3601, -71.0589]  
     m = folium.Map(location=map_center, zoom_start=3)
 
 
     # Use custom image icons
-    round_icon = folium.features.CustomIcon('/Users/zachsebek/Documents/GitHub/geo-insight-zach/images/GeoGuessr-Pin.png', icon_size=(32, 32))
-    #round_icon = folium.features.CustomIcon('images/GeoGuessr-Pin.png', icon_size=(32, 32))  # Path to image
+    image_path = os.path.join("images", "GeoGuessr-Pin.png")  # Correct relative path
+    round_icon = folium.features.CustomIcon(image_path, icon_size=(32, 32))  # Use the new path
     guessed_icon = folium.Icon(color='red', icon='question-sign')  # You can keep the default guessed_icon or use another image
 
     # Add round locations as custom marker
@@ -927,7 +925,6 @@ def create_interactive_map_custom_markers(round_locations, guessed_locations):
         ).add_to(m)
 
     return m
-
 
 # Printing the game function
 def print_game_json(session, game_tokens, number_of_games):
