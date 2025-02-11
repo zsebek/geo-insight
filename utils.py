@@ -836,6 +836,9 @@ def create_interactive_map(round_locations, guessed_locations):
         A folium Map object.
     """
 
+    import os
+    print("Current working directory:", os.getcwd()) 
+
     # Center the map on Boston
     map_center = [42.3601, -71.0589]  
     m = folium.Map(location=map_center, zoom_start=3)
