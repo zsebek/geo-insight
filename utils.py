@@ -820,9 +820,6 @@ def plot_round_and_guessed_locations(round_locations, guessed_locations):
 
     return ax.get_figure()
 
-Python
-import folium
-from folium.plugins import MarkerCluster
 
 def create_interactive_map(round_locations, guessed_locations):
     """
