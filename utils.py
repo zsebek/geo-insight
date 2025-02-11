@@ -840,22 +840,27 @@ def create_interactive_map(round_locations, guessed_locations):
     map_center = [42.3601, -71.0589]  
     m = folium.Map(location=map_center, zoom_start=3)
 
-    # Add round locations as green markers
+
+    # Use custom image icons
+    round_icon = folium.features.CustomIcon('images/GeoGuessr-Pin.png', icon_size=(32, 32))  # Path to image
+    guessed_icon = folium.Icon(color='red', icon='question-sign')  # You can keep the default guessed_icon or use another image
+
+    # Add round locations as custom marker
     round_marker_cluster = MarkerCluster().add_to(m)
     for round_loc in round_locations:
         folium.Marker(
             location=[round_loc['lat'], round_loc['lng']],
             popup=f"Round Location\nLatitude: {round_loc['lat']:.4f}\nLongitude: {round_loc['lng']:.4f}",
-            icon=folium.Icon(color='gray', icon='info-sign')
+            icon=round_icon
         ).add_to(round_marker_cluster)
 
-    # Add guessed locations as red markers with popups showing the score
+    # Add guessed locations as custom markers with popups showing the score
     guessed_marker_cluster = MarkerCluster().add_to(m)
     for guessed_loc in guessed_locations:
         folium.Marker(
             location=[guessed_loc['lat'], guessed_loc['lng']],
             popup=f"Guessed Location\nLatitude: {guessed_loc['lat']:.4f}\nLongitude: {guessed_loc['lng']:.4f}\nScore: {guessed_loc['score']}",
-            icon=folium.Icon(color='red', icon='question-sign')
+            icon=guessed_icon  # Use the guessed_icon here
         ).add_to(guessed_marker_cluster)
 
     # Add lines connecting round and guessed locations (thin, black, dotted)
