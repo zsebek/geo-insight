@@ -279,7 +279,7 @@ def get_game_tokens(session):
             payload_json = json.loads(entry['payload'])
             for payload in payload_json:
                 try:
-                    if payload['payload']['gameMode'] == 'Standard':
+                    if payload['payload']['gameMode'] == 'Duels':
                         game_tokens.append(payload['payload']['gameToken']) 
                 except Exception as e:
                     continue 
