@@ -791,18 +791,26 @@ def plot_round_and_guessed_locations(round_locations, guessed_locations):
     guessed_geometry = [Point(xy) for xy in zip(guessed_df['lng'], guessed_df['lat'])]
     guessed_gdf = GeoDataFrame(guessed_df, geometry=guessed_geometry, crs=world.crs)  # Added CRS
 
-    # Create lines (connecting round and guessed locations)
-    lines = [] # <--- CRUCIAL: Initialize to empty list
-    for i in range(min(len(round_gdf), len(guessed_gdf))):  # handle cases where the lengths are different
+   # Create lines (connecting round and guessed locations) with dotted style
+    lines = []
+    for i in range(min(len(round_gdf), len(guessed_gdf))):
         line = LineString([round_gdf.geometry[i], guessed_gdf.geometry[i]])
         lines.append(line)
-    lines_gdf = GeoDataFrame({'geometry': lines}, crs=world.crs)  # Added CRS
+    lines_gdf = GeoDataFrame({'geometry': lines}, crs=world.crs)
 
     # Plotting
     ax = world.plot(figsize=(10, 10), color='lightblue')  # Plot world map first
-    lines_gdf.plot(ax=ax, color='gray', linewidth=0.5)  # Plot lines
-    round_gdf.plot(ax=ax, color='green', marker='o', markersize=3, label='Round Locations')  # Plot round locations
-    guessed_gdf.plot(ax=ax, color='red', marker='x', markersize=3, label='Guessed Locations')  # Plot guessed locations
+
+    # Plot dotted lines
+    lines_gdf.plot(ax=ax, color='gray', linestyle='dotted', linewidth=1)  # <--- Dotted lines
+
+    # Plot round locations in black
+    round_gdf.plot(ax=ax, color='black', marker='o', markersize=3, label='Round Locations')  # <--- Black color
+
+    # Plot guessed locations with color gradient based on score
+    guessed_gdf.plot(ax=ax, column='score', cmap='YlOrRd', marker='x', markersize=3,
+                     legend=True, legend_kwds={'label': "Score", 'orientation': "horizontal"},
+                     vmin=0, vmax=5000, label='Guessed Locations')  # <--- Color gradient
 
     ax.set_title('Round and Guessed Locations')
     ax.set_axis_off()
