@@ -12,7 +12,6 @@ class SessionManager:
         """Returns the existing session or creates a new one for the active user."""
         if cls._session is None or cls._user is None:
             active_user = cls.get_active_user()
-            logging.info(f"🔍 Creating new session for user: {active_user}")
             cls._session = cls._authenticate_user(active_user)
         return cls._session
 
@@ -29,11 +28,9 @@ class SessionManager:
     def set_active_user(cls, user: str):
         """Sets the active user and refreshes session if needed."""
         if user not in user_cookies:
-            logging.error(f"❌ User {user} not found in stored cookies.")
             return
         
         if cls._user != user:
-            logging.info(f"✅ Switching active user to: {user}")
             cls._user = user
             cls._session = cls._authenticate_user(user)  # Refresh session when user changes
 

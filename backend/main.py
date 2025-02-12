@@ -5,7 +5,7 @@ app = FastAPI(title="GeoInsight API")
 
 # Register routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(games.router, prefix="/games", tags=["Game Data"])
+app.include_router(games.router, prefix="/data", tags=["Game Data"])
 
 @app.get("/")
 def read_root():
