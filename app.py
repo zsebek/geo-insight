@@ -44,7 +44,7 @@ if ncfa:
 
         def plot_and_display_data(stats, label):
             
-            st.text(json.dumps(stats, indent=4)) #Display the entire stats dictionary in Streamlit
+            #st.text(json.dumps(stats, indent=4)) #Display the entire stats dictionary in Streamlit
 
             # Extracting most and least stats for points and distances per country
             most_pts, least_pts = utils.get_most_and_least_data_avg(stats, type='points')
@@ -104,7 +104,7 @@ if ncfa:
         plot_and_display_data(no_mov_stats, no_mov)
         plot_and_display_data(nmpz_stats, nmpz)
 
-    games, guesses,duels = get_games_guesses_duels_dataframes()
+    games, guesses, duels = get_games_guesses_duels_dataframes()
     st.header("Standard Games")
     st.dataframe(games, use_container_width=True)
     st.header("Standard Guesses")
@@ -113,15 +113,15 @@ if ncfa:
     st.dataframe(duels, use_container_width=True)
 
 
-    # JSON printing (separate button, always visible)
-    if st.button("Print Game JSON (Caution: Large Output)"):
-        if 'game_tokens' in st.session_state:
-            game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(st.session_state.game_tokens) - 1, value=0)
-            try:
-                game_token = st.session_state.game_tokens[game_index]
-                game_data = session.get(f"{utils.BASE_URL_V3}/games/{game_token}").json()
-                st.write(json.dumps(game_data, indent=4))  # json is now available
-            except Exception as e:
-                st.error(f"Error fetching or displaying JSON: {e}")
-        else:
-            st.error("Please click 'Analyze' first to fetch game data.")
+    # JSON printing (separate button, always visible) - commented out for now
+#    if st.button("Print Game JSON (Caution: Large Output)"):
+#        if 'game_tokens' in st.session_state:
+#            game_index = st.number_input("Enter the index of the game to print (0-based)", min_value=0, max_value=len(st.session_state.game_tokens) - 1, value=0)
+#            try:
+#               game_token = st.session_state.game_tokens[game_index]
+#                game_data = session.get(f"{utils.BASE_URL_V3}/games/{game_token}").json()
+#                st.write(json.dumps(game_data, indent=4))  # json is now available
+#            except Exception as e:
+#                st.error(f"Error fetching or displaying JSON: {e}")
+#        else:
+#            st.error("Please click 'Analyze' first to fetch game data.")
