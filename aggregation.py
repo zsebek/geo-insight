@@ -82,7 +82,7 @@ def get_standard_guesses_from_tokens(tokens: list[str], ncfa: str) -> list[dict]
     return guesses
 
 def get_games_guesses_duels_dataframes():
-    ncfa: str = "kphotZ89411ie%2BEdJD43gwZoU99Tdh8lm13r0sVvSGM%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf6QGAgHHrn5qwDlR2I5Jqds%3D"
+    ncfa: str = "CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D"
     games = get_games(ncfa)
     standard_games = [game for game in games if game['game_mode'] == 'Standard']
     standard_tokens = [game['game_token'] for game in standard_games]
