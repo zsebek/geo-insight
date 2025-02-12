@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from config.keys import user_cookies
 from services.auth.login import login
 from services.auth.session_manager import SessionManager
@@ -17,12 +17,9 @@ def get_stored_session():
     """Returns session status."""
     return {"data": SessionManager.get_session()}
 
-
 @router.get("/users")
 def get_auth_users():
     return {"data": SessionManager.get_users()}
-
-
 
 @router.post("/active_user")
 def set_active_user(user_name: str):
@@ -31,7 +28,6 @@ def set_active_user(user_name: str):
 @router.get("/active_user")
 def get_active_user():
     return {"data": SessionManager.get_active_user()}
-
 
 # if __name__=="__main__":
 #     from utils.http import get
