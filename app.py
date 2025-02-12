@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import utils
 import json
+from aggregation import get_games_guesses_duels_dataframes
 
 st.title('GeoCoach')
 st.write('''
@@ -102,6 +103,14 @@ if ncfa:
         plot_and_display_data(mov_stats, mov)
         plot_and_display_data(no_mov_stats, no_mov)
         plot_and_display_data(nmpz_stats, nmpz)
+
+    games, guesses,duels = get_games_guesses_duels_dataframes()
+    st.header("Standard Games")
+    st.dataframe(games, use_container_width=True)
+    st.header("Standard Guesses")
+    st.dataframe(guesses, use_container_width=True)
+    st.header("Duels")
+    st.dataframe(duels, use_container_width=True)
 
 
     # JSON printing (separate button, always visible)
