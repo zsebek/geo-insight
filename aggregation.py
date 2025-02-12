@@ -3,6 +3,9 @@ from requests import Session
 import json
 from config import BASE_URL_V3, BASE_URL_V4
 import pandas as pd
+from geopy.geocoders import Nominatim
+
+geolocator = Nominatim(user_agent="geoguessr_country_finder")  # Initialize geolocator *once*
 
 def get_session(ncfa) -> Session:
     session = requests.Session()
@@ -61,6 +64,19 @@ def get_standard_guesses_from_tokens(tokens: list[str], ncfa: str) -> list[dict]
         game = response.json()
         for i, actual in enumerate(game["rounds"]):
             guess = game["player"]["guesses"][i]  # Matching guesses
+            guessed_lat = guess["lat"]
+            guessed_lng = guess["lng"]
+
+            try:
+                location = geolocator.reverse((guessed_lat, guessed_lng), timeout=10)  # Set a timeout
+                if location:
+                    address = location.raw['address']
+                    guessed_country = address.get('country', 'UNKNOWN')  # Extract country, handle missing
+                else:
+                    guessed_country = "UNKNOWN"
+            except Exception as e:  # Catch potential geocoding errors
+                print(f"Geocoding error: {e} for lat: {guessed_lat}, lng: {guessed_lng}")
+                guessed_country = "UNKNOWN"
             new_guess = \
                 {
                 "game_token": token,
@@ -72,8 +88,9 @@ def get_standard_guesses_from_tokens(tokens: list[str], ncfa: str) -> list[dict]
                 "actual_zoom": actual['zoom'],
                 "actual_panoId": actual['panoId'],
                 "country_code": actual.get("streakLocationCode", "UNKNOWN"),
-                "guessed_lat": guess["lat"],
-                "guessed_lng": guess["lng"],
+                "guessed_lat": guessed_lat,
+                "guessed_lng": guessed_lng,
+                "guessed_country": guessed_country,  # Add guessed country
                 "score": int(guess["roundScore"]["amount"]),
                 "distance_km": float(guess["distanceInMeters"]/1000),
                 "time_spent_sec": int(guess["time"]),
