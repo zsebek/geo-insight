@@ -77,6 +77,9 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO Jason;
 Exit psql:
 \q
 
+Figure out SQL for generating tables.
+
+
 🔹 Option 1: Using pgAdmin GUI
 1️⃣ Open pgAdmin
 Open pgAdmin and connect to your PostgreSQL server.

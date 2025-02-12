@@ -6,6 +6,25 @@ from config.api_urls import BASE_URL_V3, BASE_URL_V4
 from services.auth.session_manager import SessionManager
 from database.geoguessr import get_db
 
+
+def get_all_games():
+    db = next(get_db())
+    games = db.query(StandardGame).all()
+    db.close()
+    return [game.__dict__ for game in games]
+    
+def get_all_guesses():
+    db: Session = next(get_db())
+    guesses = db.query(StandardGuess).all()
+    db.close()
+    return [guess.__dict__ for guess in guesses]
+    
+def get_all_duels():
+    db: Session = next(get_db())
+    duels = db.query(Duel).all()
+    db.close()
+    return [duel.__dict__ for duel in duels]
+
 def fetch_all():
     session = SessionManager.get_session()
     db = next(get_db())
@@ -119,5 +138,6 @@ def store_game(db: Session, data: dict):
     db.commit()
 
 if __name__=="__main__":
-    fetch_all()
+    res = get_all_games()
+    print(res)
     

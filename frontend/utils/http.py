@@ -1,5 +1,12 @@
 import requests
 
+
+# external api wrappers - response
+def get_url(req: str):
+    res = requests.get("http://localhost:8000/" + req)
+    return res.json(), res.ok
+
+# backend wrappers
 def get(req: str):
     res = requests.get("http://localhost:8000/" + req)
     return res.json(), res.ok
