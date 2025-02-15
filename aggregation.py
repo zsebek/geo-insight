@@ -1,13 +1,33 @@
 import requests
 from requests import Session
 import json
-from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_URL
+from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_DOMAIN, GAME_SERVER_URL
 import pandas as pd
 from geopy.geocoders import Nominatim
 
-def get_session(ncfa) -> Session:
+def get_session(ncfa: str, domain: str = "www.geoguessr.com", session_user: dict[str, str] = None) -> Session:
     session = requests.Session()
-    session.cookies.set("_ncfa", ncfa, domain="www.geoguessr.com")
+    session.cookies.set("_ncfa", ncfa, domain=domain)
+    
+    # supply optional session_user cookie when domain is https://game-server.geoguessr.com
+    if session_user:
+        """
+            got game-server request to work with, let's see if hjSessionUser_id changes for you
+            cookies = {
+                "_ncfa": "l920 ... blah",
+                "_hjSessionUser_2662791": "eyJp ... blah",
+            }
+        """
+        for key, val in session_user.items():
+            session.cookies.set(key, val, domain=domain)
+    
+    session.headers.update({
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept": "application/json",
+        "Referer": f"https://{domain}/",
+        "Origin": f"https://{domain}",
+        "Connection": "keep-alive",
+    })
     return session
 
 def add_game_to_list(data: dict, games: list):
@@ -103,13 +123,14 @@ def print_game_details(tokens: list[str], ncfa: str):
             print(f"An unexpected error occurred: {e}")
             print("-" * 20)
 
-def print_duel_details(tokens: list[str], ncfa: str):
+def print_duel_details(tokens: list[str], ncfa: str, session_user: dict[str, str]):
     """Prints the full game details for each token."""
-    session: Session = get_session(ncfa)
+    session: Session = get_session(ncfa, GAME_SERVER_DOMAIN, session_user)
     for token in tokens:
+        
         response = session.get(f"{GAME_SERVER_URL}/duels/{token}")
         if not response.ok:
-            print(f"Error getting game data for token: {token}")  # Print error if request fails
+            print(f"Error getting duel data for token: {token}")  # Print error if request fails
             continue
 
         try:
@@ -153,8 +174,10 @@ def geocode(guesses: pd.DataFrame):
 if __name__=="__main__":
     # define token for debugging; call main function.
     ncfa: str = "CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D"
-    ncfa_gameserver: str = "Y2iRgBhFdKt7TOhYsSzbK7NuJm204qTC2yJ6APJvV00%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf%2Fo%2B4S%2BXBIJRukGooMGHkfE%3D"
-    
+    ncfa_gameserver: str = "I9208e6tk3iIHYUfPiXhU2c3d9HYqsNhqlPXjOlc700%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfzkj5ZFpNoUAPMbHFo5OjOc%3D"
+    session_user = {
+         "_hjSessionUser_2662791": "eyJpZCI6ImY2YzRhYjlkLTdmNDAtNTlhYy05MjA1LTRmMDZkOTM5ZjhlNSIsImNyZWF0ZWQiOjE3MjgwODM1MDAxMzYsImV4aXN0aW5nIjp0cnVlfQ=="
+    }
     standard_games, guesses, duels = get_games_guesses_duels_dataframes()
 
     # Print the DataFrames
@@ -181,4 +204,4 @@ if __name__=="__main__":
     # Need to figure out how to print Duel & BattleRoyale info. perhaps a different game endpoint or something. Since the tokens below (different format than 1-player) don't work
     example_tokens = ["Xv6TIlyL73VMvSGT", "5f5b948b-a397-43c1-9ca0-8671bf078fd6", "8ef1d8b7-e584-4bab-b257-f7d7f871208c"] # *REPLACE with your actual tokens*
     print_game_details(example_tokens, ncfa)
-    print_duel_details(example_tokens, ncfa_gameserver)
+    print_duel_details(example_tokens, ncfa_gameserver, session_user)

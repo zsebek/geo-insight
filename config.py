@@ -1,5 +1,6 @@
 BASE_URL_V4 = "https://www.geoguessr.com/api/v4"
 BASE_URL_V3 = "https://www.geoguessr.com/api/v3"
+GAME_SERVER_DOMAIN = "game-server.geoguessr.com"
 GAME_SERVER_URL = "https://game-server.geoguessr.com/api"
 
 country_codes = {
