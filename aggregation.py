@@ -1,7 +1,7 @@
 import requests
 from requests import Session
 import json
-from config import BASE_URL_V3, BASE_URL_V4
+from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_URL
 import pandas as pd
 from geopy.geocoders import Nominatim
 
@@ -103,6 +103,27 @@ def print_game_details(tokens: list[str], ncfa: str):
             print(f"An unexpected error occurred: {e}")
             print("-" * 20)
 
+def print_duel_details(tokens: list[str], ncfa: str):
+    """Prints the full game details for each token."""
+    session: Session = get_session(ncfa)
+    for token in tokens:
+        response = session.get(f"{GAME_SERVER_URL}/duels/{token}")
+        if not response.ok:
+            print(f"Error getting game data for token: {token}")  # Print error if request fails
+            continue
+
+        try:
+            game_data = response.json()
+            print(json.dumps(game_data, indent=4)) # Print the full JSON response
+            print("-" * 20)  # Separator between games
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON for token: {token}") # Handle JSON decode errors
+            print(response.text) # Optionally print the raw text of the response for debugging
+            print("-" * 20)
+        except Exception as e: # Catching other potential errors
+            print(f"An unexpected error occurred: {e}")
+            print("-" * 20)
+
 def get_games_guesses_duels_dataframes():
     ncfa: str = "CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D"
     games = get_games(ncfa)
@@ -158,3 +179,4 @@ if __name__=="__main__":
     # Need to figure out how to print Duel & BattleRoyale info. perhaps a different game endpoint or something. Since the tokens below (different format than 1-player) don't work
     example_tokens = ["Xv6TIlyL73VMvSGT", "5f5b948b-a397-43c1-9ca0-8671bf078fd6", "8ef1d8b7-e584-4bab-b257-f7d7f871208c"] # *REPLACE with your actual tokens*
     print_game_details(example_tokens, ncfa)
+    print_duel_details(example_tokens, ncfa)
