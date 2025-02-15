@@ -3,6 +3,7 @@ from requests import Session
 import json
 from config import BASE_URL_V3, BASE_URL_V4
 import pandas as pd
+from geopy.geocoders import Nominatim
 
 def get_session(ncfa) -> Session:
     session = requests.Session()
@@ -90,5 +91,23 @@ def get_games_guesses_duels_dataframes():
     duels = [game for game in games if game not in standard_games]
     return pd.DataFrame(standard_games), pd.DataFrame(standard_guesses), pd.DataFrame(duels)
 
+def geocode(guesses: pd.DataFrame):
+    geolocator = Nominatim(user_agent="geoapp")
+    length = len(guesses)
+    progress = {"iter": 0}
+    def reverse_geocode(row):
+        print(f"{progress['iter']} / {length}")
+        try:
+            location = geolocator.reverse((row['guessed_lat'], row['guessed_lng']), exactly_one=True)
+            progress['iter'] +=1
+            return location.address if location else None
+        except Exception as e:
+            return f"Error: {e}"
+
+    # Apply reverse geocoding to each row
+    guesses['location'] = guesses.apply(reverse_geocode, axis=1)
+    return guesses
+
 if __name__=="__main__":
-    get_games_guesses_duels_dataframes()
+    _, guesses, _ = get_games_guesses_duels_dataframes()
+    geocode(guesses)
