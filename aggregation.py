@@ -21,13 +21,6 @@ def get_session(ncfa: str, domain: str = "www.geoguessr.com", session_user: dict
         for key, val in session_user.items():
             session.cookies.set(key, val, domain=domain)
     
-    session.headers.update({
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept": "application/json",
-        "Referer": f"https://{domain}/",
-        "Origin": f"https://{domain}",
-        "Connection": "keep-alive",
-    })
     return session
 
 def add_game_to_list(data: dict, games: list):
