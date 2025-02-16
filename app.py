@@ -109,8 +109,11 @@ if ncfa:
     st.dataframe(games, use_container_width=True)
     st.header("Standard Guesses")
     st.dataframe(guesses, use_container_width=True)
-    st.header("Duels")
-    st.dataframe(duels, use_container_width=True)
+    st.header("Duel Games")
+    st.dataframe(duel_games, use_container_width=True)
+    st.header("Duel Guesses")
+    st.dataframe(duel_guesses, use_container_width=True)
+
 
 
     # JSON printing (separate button, always visible) - commented out for now

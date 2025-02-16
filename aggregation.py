@@ -4,6 +4,7 @@ import json
 from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_DOMAIN, GAME_SERVER_URL
 import pandas as pd
 from geopy.geocoders import Nominatim
+from datetime import datetime
 
 def get_session(ncfa: str, domain: str = "www.geoguessr.com", session_user: dict[str, str] = None) -> Session:
     session = requests.Session()
@@ -95,6 +96,57 @@ def get_standard_guesses_from_tokens(tokens: list[str], ncfa: str) -> list[dict]
             guesses.append(new_guess)
     return guesses    
 
+def get_duel_guesses_from_tokens(tokens: list[str], ncfa: str, session_user: dict[str, str]) -> list[dict]:
+    guesses = []
+    session: Session = get_session(ncfa, GAME_SERVER_DOMAIN, session_user)
+    for token in tokens:
+        response = session.get(f"{GAME_SERVER_URL}/duels/{token}")
+        if not response.ok:
+            print(f"Error getting duel data for token: {token}")
+            continue
+        try:
+            game_data = response.json()
+            for team in game_data["teams"]:
+                for player in team["players"]:
+                    for guess in player["guesses"]:
+                        round_data = next((r for r in game_data["rounds"] if r["roundNumber"] == guess["roundNumber"]), None)
+                        round_results_data = next((rr for rr in team["roundResults"] if rr["roundNumber"] == guess["roundNumber"]), None)  # Get round results
+                        if round_data and round_results_data:  # Both must exist
+                            new_guess = {
+                                "game_token": game_data["gameId"],
+                                "round_number": guess["roundNumber"],
+                                "actual_lat": round_data["panorama"]["lat"],
+                                "actual_lng": round_data["panorama"]["lng"],
+                                "actual_heading": round_data["panorama"]['heading'],
+                                "actual_pitch": round_data["panorama"]['pitch'],
+                                "actual_zoom": round_data["panorama"]['zoom'],
+                                "actual_panoId": round_data["panorama"]['panoId'],
+                                "country_code": round_data["panorama"].get("countryCode", "UNKNOWN"),
+                                "guessed_lat": guess["lat"],
+                                "guessed_lng": guess["lng"],
+                                "score": int(guess["score"]),
+                                "distance_km": float(guess["distance"] / 1000),
+                                "time_spent_sec": (
+                                    (
+                                        datetime.fromisoformat(guess["created"].replace("Z", "+00:00")) - 
+                                        datetime.fromisoformat(round_data["startTime"].replace("Z", "+00:00"))
+                                    ).total_seconds() if round_data.get("startTime") else None
+                                ),
+                                "player_id": player["playerId"],
+                                "team_name": team["name"],
+                                "health_before": round_results_data.get("healthBefore"), 
+                                "health_after": round_results_data.get("healthAfter"),  
+                                "multiplier": round_data.get("multiplier"),  
+                                "damage_multiplier": round_data.get("damageMultiplier")  
+                            }
+                            guesses.append(new_guess)
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON for token: {token}")
+            print(response.text)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+    return guesses
+
 def print_game_details(tokens: list[str], ncfa: str):
     """Prints the full game details for each token."""
     session: Session = get_session(ncfa)
@@ -140,12 +192,18 @@ def print_duel_details(tokens: list[str], ncfa: str, session_user: dict[str, str
 
 def get_games_guesses_duels_dataframes():
     ncfa: str = "CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D"
+    ncfa_gameserver: str = "I9208e6tk3iIHYUfPiXhU2c3d9HYqsNhqlPXjOlc700%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfzkj5ZFpNoUAPMbHFo5OjOc%3D"
+    session_user = {
+         "_hjSessionUser_2662791": "eyJpZCI6ImY2YzRhYjlkLTdmNDAtNTlhYy05MjA1LTRmMDZkOTM5ZjhlNSIsImNyZWF0ZWQiOjE3MjgwODM1MDAxMzYsImV4aXN0aW5nIjp0cnVlfQ=="
+    }
     games = get_games(ncfa)
     standard_games = [game for game in games if game['game_mode'] == 'Standard']
     standard_tokens = [game['game_token'] for game in standard_games]
     standard_guesses = get_standard_guesses_from_tokens(standard_tokens, ncfa)
-    duels = [game for game in games if game not in standard_games]
-    return pd.DataFrame(standard_games), pd.DataFrame(standard_guesses), pd.DataFrame(duels)
+    duel_games = [game for game in games if game['game_mode'] == 'Duels']
+    duel_tokens = [game['game_id'] for game in duel_games]
+    duel_guesses = get_duel_guesses_from_tokens(duel_tokens, ncfa_gameserver, session_user)
+    return pd.DataFrame(standard_games), pd.DataFrame(standard_guesses), pd.DataFrame(duel_games), pd.DataFrame(duel_tokens), pd.DataFrame(duel_guesses)
 
 def geocode(guesses: pd.DataFrame):
     geolocator = Nominatim(user_agent="geoapp")
@@ -165,13 +223,15 @@ def geocode(guesses: pd.DataFrame):
     return guesses
 
 if __name__=="__main__":
-    # define token for debugging; call main function.
+    # define tokens for debugging; call main function.
     ncfa: str = "CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D"
     ncfa_gameserver: str = "I9208e6tk3iIHYUfPiXhU2c3d9HYqsNhqlPXjOlc700%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfzkj5ZFpNoUAPMbHFo5OjOc%3D"
     session_user = {
          "_hjSessionUser_2662791": "eyJpZCI6ImY2YzRhYjlkLTdmNDAtNTlhYy05MjA1LTRmMDZkOTM5ZjhlNSIsImNyZWF0ZWQiOjE3MjgwODM1MDAxMzYsImV4aXN0aW5nIjp0cnVlfQ=="
     }
-    standard_games, guesses, duels = get_games_guesses_duels_dataframes()
+
+    # Call primary Data gathering function
+    standard_games, standard_guesses, duel_games, duel_tokens, duel_guesses = get_games_guesses_duels_dataframes()
 
     # Print the DataFrames
     # print("Standard Games DataFrame:")
@@ -180,21 +240,35 @@ if __name__=="__main__":
     # print("\nGuesses DataFrame:")
     # print(guesses)
 
-    # print("\nDuels DataFrame:")
-    print(duels)
+    print("\nduel_games DataFrame:")
+    print(duel_games)
+
+    # print("\nduel_tokens DataFrame:")
+    # print(duel_tokens)
+
+    print("\nduel_guesses DataFrame:")
+    print(duel_guesses)
 
     #Geocode and print the updated guess dataframe
-    #guesses = geocode(guesses)
-    #print("\nGuesses DataFrame with Geocoding:")
-    #print(guesses)
+    duel_guesses = geocode(duel_guesses)
+    print("\nDuel_Guesses DataFrame with Geocoding:")
+    print(duel_guesses)
 
     # Save the geocoded guesses DataFrame to a CSV file
-    #guesses.to_csv("geocoded_guesses.csv", index=False, encoding='utf-8')  # Most common format
-    #print("\nGeocoded guesses saved to geocoded_guesses.csv")
+    duel_guesses.to_csv("geocoded_guesses_duels.csv", index=False, encoding='utf-8')  # Most common format
+    print("\nGeocoded guesses saved to geocoded_guesses_duels.csv")
+
+    #### Debugging Additional example Tokens; Testing Duel Helper Functions and Duel Guesses Function
 
     # Test print_game_details
     # First token is Standard game [works], second and third are duels [don't work]
     # Need to figure out how to print Duel & BattleRoyale info. perhaps a different game endpoint or something. Since the tokens below (different format than 1-player) don't work
-    example_tokens = ["Xv6TIlyL73VMvSGT", "5f5b948b-a397-43c1-9ca0-8671bf078fd6", "8ef1d8b7-e584-4bab-b257-f7d7f871208c"] # *REPLACE with your actual tokens*
-    print_game_details(example_tokens, ncfa)
-    print_duel_details(example_tokens, ncfa_gameserver, session_user)
+    # example_tokens = ["8ef1d8b7-e584-4bab-b257-f7d7f871208c"] 
+    # print_game_details(example_tokens, ncfa)
+    # print_duel_details(example_tokens, ncfa_gameserver, session_user)
+
+    # duel_data = get_duel_guesses_from_tokens(example_tokens, ncfa_gameserver, session_user)
+
+    # if duel_data: 
+    #     print(json.dumps(duel_data, indent=4))
+
