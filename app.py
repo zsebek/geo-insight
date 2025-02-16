@@ -104,7 +104,7 @@ if ncfa:
         plot_and_display_data(no_mov_stats, no_mov)
         plot_and_display_data(nmpz_stats, nmpz)
 
-    games, guesses, duels = get_games_guesses_duels_dataframes()
+    standard_games, standard_guesses, duel_games, duel_tokens, duel_guesses = get_games_guesses_duels_dataframes()
     st.header("Standard Games")
     st.dataframe(games, use_container_width=True)
     st.header("Standard Guesses")
