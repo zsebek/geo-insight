@@ -106,9 +106,9 @@ if ncfa:
 
     standard_games, standard_guesses, duel_games, duel_tokens, duel_guesses = get_games_guesses_duels_dataframes()
     st.header("Standard Games")
-    st.dataframe(games, use_container_width=True)
+    st.dataframe(standard_games, use_container_width=True)
     st.header("Standard Guesses")
-    st.dataframe(guesses, use_container_width=True)
+    st.dataframe(standard_guesses, use_container_width=True)
     st.header("Duel Games")
     st.dataframe(duel_games, use_container_width=True)
     st.header("Duel Guesses")
