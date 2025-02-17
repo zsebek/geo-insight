@@ -13,18 +13,11 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: Streamlit",
+            "name": "Debug CurFile",
             "type": "debugpy",
             "request": "launch",
-            "module": "streamlit",
-            "args": [
-                "run",
-                "app.py",
-                "--server.port",
-                "8501"
-            ],
-            "console": "integratedTerminal",
-            "justMyCode": false
-        }
+            "program": "${file}",
+            "cwd": "${workspaceFolder}",
+        },
     ]
 }
