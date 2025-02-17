@@ -229,7 +229,7 @@ def get_games_guesses_duels_dataframes():
     session_user = {
          "_hjSessionUser_2662791": "eyJpZCI6ImY2YzRhYjlkLTdmNDAtNTlhYy05MjA1LTRmMDZkOTM5ZjhlNSIsImNyZWF0ZWQiOjE3MjgwODM1MDAxMzYsImV4aXN0aW5nIjp0cnVlfQ=="
     }
-    games = get_games(ncfa)
+    games = get_all_games(ncfa)
     standard_games = [game for game in games if game['game_mode'] == 'Standard']
     standard_tokens = [game['game_token'] for game in standard_games]
     standard_guesses = get_standard_guesses_from_tokens(standard_tokens, ncfa)
@@ -309,7 +309,7 @@ def get_all_games(ncfa: str) -> list[dict]:
             print("Invalid JSON response. Stopping.")
             break
 
-    return pd.DataFrame(all_games)
+    return all_games
     
 
 if __name__=="__main__":
@@ -343,18 +343,16 @@ if __name__=="__main__":
     print("\nduel_guesses DataFrame:")
     print(duel_guesses)
 
-    #Geocode and print the updated guess dataframe
-    duel_guesses = geocode(duel_guesses)
-    print("\nDuel_Guesses DataFrame with Geocoding:")
-    print(duel_guesses)
+    # #Geocode and print the updated guess dataframe
+    # duel_guesses = geocode(duel_guesses)
+    # print("\nDuel_Guesses DataFrame with Geocoding:")
+    # print(duel_guesses)
 
     # Save the geocoded guesses DataFrame to a CSV file
-    duel_guesses.to_csv("geocoded_guesses_duels.csv", index=False, encoding='utf-8')  # Most common format
-    print("\nGeocoded guesses saved to geocoded_guesses_duels.csv")
+    # duel_guesses.to_csv("geocoded_guesses_duels.csv", index=False, encoding='utf-8')  # Most common format
+    # print("\nGeocoded guesses saved to geocoded_guesses_duels.csv")
 
-    
-    all_games = get_all_games(ncfa)
-    print("\nAll games dataframe")
+
     #### Debugging Additional example Tokens; Testing Duel Helper Functions and Duel Guesses Function
 
     # Test print_game_details
