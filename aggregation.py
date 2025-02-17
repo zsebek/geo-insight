@@ -1,4 +1,5 @@
 import requests
+import time
 from requests import Session
 import json
 from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_DOMAIN, GAME_SERVER_URL
@@ -26,21 +27,53 @@ def get_session(ncfa: str, domain: str = "www.geoguessr.com", session_user: dict
 
 def add_game_to_list(data: dict, games: list):
     """ return by value """
-    is_standard = True
-    if data['gameMode'] in ['BattleRoyaleDistance', 'Duels']:
-        is_standard = False
+    is_standard_game = True
+    is_standard_duel = False
+    is_nonstandard_duel = False
+    is_challenge = False
+    
+    if data['gameMode'] in ['Streak', 'LiveChallenge', 'Bullseye', 'CompetitiveCityStreak']:
+        return
+    
+    if data['gameMode'] in ['BattleRoyaleDistance', 'Duels', 'TeamDuels', 'BattleRoyaleCountries']:
+        is_standard_duel = True
+        is_standard_game = False
+        if not data.get('competitiveGameMode', False):
+            is_nonstandard_duel = True
+            is_standard_duel = False
+    if data.get('challengeToken', False):
+        is_challenge = True
+        is_standard_game = False
+
     new_game = {
         "map_slug": data["mapSlug"],
         "map_name": data["mapName"],
         "points": data["points"],
         "game_token": data["gameToken"],
         "game_mode": data["gameMode"],
-    } if is_standard else \
+    } if is_standard_game else \
     {
         "game_id": data['gameId'],
         "game_mode": data['gameMode'],
         "competitive_game_mode": data['competitiveGameMode']
+    } if is_standard_duel else \
+    {
+        "game_id": data['gameId'],
+        "game_mode": data['gameMode'],
+        "party_id": data['partyId'],
+    } if is_nonstandard_duel else \
+    {
+        "map_slug": data["mapSlug"],
+        "map_name": data["mapName"],
+        "points": data["points"],
+        "game_token": data["challengeToken"],
+        "game_mode": data["gameMode"],
+        "is_daily": data["isDailyChallenge"]
+    } if is_challenge else \
+    {
+        
     }
+    # TODO: support Challenges model
     games.append(new_game)
 
 def get_games(ncfa: str) -> list[dict]:
@@ -222,14 +255,75 @@ def geocode(guesses: pd.DataFrame):
     guesses['location'] = guesses.apply(reverse_geocode, axis=1)
     return guesses
 
+
+def get_all_games(ncfa: str) -> list[dict]:
+    """Fetch all game entries from the GeoGuessr API using pagination tokens."""
+    session = get_session(ncfa)  # Your function for session auth
+    all_games = []
+    pagination_token = None  # Start without a token
+
+    while True:
+        params = {}
+        if pagination_token:
+            params["paginationToken"] = pagination_token  # Use token if available
+
+        # response = session.get(f"{BASE_URL_V4}/feed/friends", params=params)
+        response = session.get(f"{BASE_URL_V4}/feed/private", params=params)
+
+        if response.status_code == 429:
+            print("Rate limited. Sleeping for 10 seconds...")
+            time.sleep(10)
+            continue
+        elif response.status_code != 200:
+            print(f"Request failed: {response.text}")
+            break
+
+        try:
+            data = response.json()
+            entries = data.get('entries', [])
+            pagination_token = data.get("paginationToken")  # Extract new token
+
+            if not entries:
+                break
+            if not pagination_token:
+                print("No pagination token found. Stopping.")
+                break
+            for entry in entries:
+                data = json.loads(entry['payload'])
+                if not data:
+                    continue
+                # handle a single game
+                if isinstance(data, dict):
+                    if 'gameMode' not in data:  # looks for key 'gameMode' in dict, ignore badges
+                        continue
+                    add_game_to_list(data, all_games)
+                # handle when data is a list of games
+                elif isinstance(data, list):
+                    for game in data:
+                        payload = game['payload']
+                        if 'gameMode' not in payload:
+                            continue
+                        add_game_to_list(payload, all_games)
+
+        except requests.exceptions.JSONDecodeError:
+            print("Invalid JSON response. Stopping.")
+            break
+
+    return pd.DataFrame(all_games)
+    
+
 if __name__=="__main__":
+    ncfa = "OSNSzcFekc1dEHNEHcHJqBT%2FD9Y7xS1lgmEHUpPYm3s%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfwnkjySGP9%2FXgFwPD3nN40Q%3D"
+    
+    all_games = get_all_games(ncfa)
+    print("\nAll games dataframe")
+    print(all_games)
     # define tokens for debugging; call main function.
     ncfa: str = "CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D"
     ncfa_gameserver: str = "I9208e6tk3iIHYUfPiXhU2c3d9HYqsNhqlPXjOlc700%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfzkj5ZFpNoUAPMbHFo5OjOc%3D"
     session_user = {
          "_hjSessionUser_2662791": "eyJpZCI6ImY2YzRhYjlkLTdmNDAtNTlhYy05MjA1LTRmMDZkOTM5ZjhlNSIsImNyZWF0ZWQiOjE3MjgwODM1MDAxMzYsImV4aXN0aW5nIjp0cnVlfQ=="
     }
-
     # Call primary Data gathering function
     standard_games, standard_guesses, duel_games, duel_tokens, duel_guesses = get_games_guesses_duels_dataframes()
 
@@ -258,6 +352,9 @@ if __name__=="__main__":
     duel_guesses.to_csv("geocoded_guesses_duels.csv", index=False, encoding='utf-8')  # Most common format
     print("\nGeocoded guesses saved to geocoded_guesses_duels.csv")
 
+    
+    all_games = get_all_games(ncfa)
+    print("\nAll games dataframe")
     #### Debugging Additional example Tokens; Testing Duel Helper Functions and Duel Guesses Function
 
     # Test print_game_details
