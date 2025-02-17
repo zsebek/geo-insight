@@ -5,6 +5,11 @@ pandas
 Requests
 Shapely
 streamlit
+<<<<<<< HEAD
+folium
+=======
+geopy
+>>>>>>> b8dc3acbc5e79d922c4083e26a5b374b7f9f00bd
 fastapi
 uvicorn
 psycopg2-binary 

@@ -939,3 +939,16 @@ def print_game_json(session, game_tokens, number_of_games):
         except Exception as e:
             print(f"Error fetching game {token}: {e}")
             continue  # Continue to the next game even if one fails
+
+
+# Debugging setup - further modify the get_stats 
+# Make a new get stats method with no interaction w/ front end [no progress bars, no tokens]
+if __name__=="__main__":
+    ncfa ='CkEPxRnm%2BpatXNu92E7AgHIs9Cmyn5TqjGkLjgx15as%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsf0rGV%2FswebIaTvb%2FeO6Qyz8%3D'
+    # Test cases
+    session = get_session(ncfa)
+    game_tokens = get_game_tokens(session)
+
+    stats = get_stats(session, game_tokens, 100, 50)
+
+    plot_round_and_guessed_locations(stats['round_locations'], stats['guessed_locations']) 
