@@ -314,22 +314,33 @@ def get_all_games(ncfa: str) -> list[dict]:
 
 def create_duel_guesses_google_map(duel_guesses):
     """
-    Creates an embedded Google Map with markers for guessed locations in duel games.
+    Creates an embedded Google Map with markers for guessed locations and actual round locations in duel games.
+    Actual locations are marked with a custom icon and include lat/lng in the title.
 
     Args:
-        duel_guesses (pd.DataFrame): DataFrame containing duel guess data with 'guessed_lat' and 'guessed_lng' columns.
+        duel_guesses (pd.DataFrame): DataFrame containing duel guess data with 'guessed_lat', 'guessed_lng', 'actual_lat', and 'actual_lng' columns.
     """
     try:
-        # Extract latitude and longitude
-        latitudes = duel_guesses['guessed_lat']
-        longitudes = duel_guesses['guessed_lng']
+        # Extract latitudes and longitudes for guessed locations
+        guessed_lats = duel_guesses['guessed_lat']
+        guessed_lngs = duel_guesses['guessed_lng']
+
+        # Extract latitudes and longitudes for actual round locations
+        actual_lats = duel_guesses['actual_lat']
+        actual_lngs = duel_guesses['actual_lng']
 
         # Create a gmplot map centered on the mean of guessed latitudes and longitudes
-        gmap = gmplot.GoogleMapPlotter(latitudes.mean(), longitudes.mean(), 2)  # Zoom level 2
+        gmap = gmplot.GoogleMapPlotter(guessed_lats.mean(), guessed_lngs.mean(), 2)  # Zoom level 2
 
-        # Add markers for each guessed location
+        # Add markers for each guessed location (blue markers)
         for index, row in duel_guesses.iterrows():
-            gmap.marker(row['guessed_lat'], row['guessed_lng'], title=f"Round {row['round_number']}")
+            gmap.marker(row['guessed_lat'], row['guessed_lng'], title=f"Guessed Round {row['round_number']}", color='blue')
+
+        # Add markers for each actual round location with custom icon and lat/lng in title
+        for index, row in duel_guesses.iterrows():
+            title = f"Actual Round {row['round_number']} - Lat: {row['actual_lat']:.4f}, Lng: {row['actual_lng']:.4f}"
+            gmap.marker(row['actual_lat'], row['actual_lng'], title=title, 
+                        icon='images/GeoGuessr-Pin.png')  # Path to your icon
 
         # Save the map as an HTML file
         gmap.draw("duel_guesses_google_map.html")
@@ -347,8 +358,7 @@ def create_duel_guesses_google_map(duel_guesses):
         print("Map saved to duel_guesses_google_map.html")
 
     except Exception as e:
-        print(f"Error creating duel guesses map: {e}")
-    
+        print(f"Error creating duel guesses map: {e}")    
 
 if __name__=="__main__":
     ncfa = "OSNSzcFekc1dEHNEHcHJqBT%2FD9Y7xS1lgmEHUpPYm3s%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfwnkjySGP9%2FXgFwPD3nN40Q%3D"
