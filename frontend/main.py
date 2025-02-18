@@ -1,19 +1,16 @@
 import streamlit as st
-from utils.http import get
-from components.user_control import render_user_selector
-from components.app_background import app_background
-from components.timeboard_layout import render_timeboard
-from components.board_edit import render_edit_mode
-from components.board_layout import render_board_layout
 
-app_background()
-if "active_tab" not in st.session_state:
-    st.session_state["active_tab"] = "Dashboard"
+# TODO: make user selector 
+active_user = "Zach"
+st.set_page_config(layout="wide")
+home_page = st.Page("pages/home.py", title=f"{active_user}'s GeoCoach", icon=":material/globe_location_pin:")
+tactical_page = st.Page("pages/tactical.py", title="Tactical Analytics Dashboard", icon=":material/analytics:")
 
-# ✅ Use `st.session_state["active_tab"]` without modifying it
-if st.session_state["active_tab"] == "Raw Data":
-    render_timeboard()
-elif st.session_state.get("edit_mode", False):
-    render_edit_mode()
-else:
-    render_board_layout()
+pg = st.navigation(
+    {
+        "": [home_page],
+		"Analysis": [tactical_page],
+	}
+)
+
+pg.run()
