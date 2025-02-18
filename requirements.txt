@@ -5,6 +5,7 @@ pandas
 Requests
 Shapely
 streamlit
+gmplot
 <<<<<<< HEAD
 folium
 =======
