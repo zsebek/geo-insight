@@ -2,10 +2,11 @@ import requests
 import time
 from requests import Session
 import json
-from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_DOMAIN, GAME_SERVER_URL
+from config import BASE_URL_V3, BASE_URL_V4, GAME_SERVER_DOMAIN, GAME_SERVER_URL, GOOGLE_API_KEY
 import pandas as pd
 from geopy.geocoders import Nominatim
 from datetime import datetime
+import gmplot
 
 def get_session(ncfa: str, domain: str = "www.geoguessr.com", session_user: dict[str, str] = None) -> Session:
     session = requests.Session()
@@ -310,6 +311,43 @@ def get_all_games(ncfa: str) -> list[dict]:
             break
 
     return all_games
+
+def create_duel_guesses_google_map(duel_guesses):
+    """
+    Creates an embedded Google Map with markers for guessed locations in duel games.
+
+    Args:
+        duel_guesses (pd.DataFrame): DataFrame containing duel guess data with 'guessed_lat' and 'guessed_lng' columns.
+    """
+    try:
+        # Extract latitude and longitude
+        latitudes = duel_guesses['guessed_lat']
+        longitudes = duel_guesses['guessed_lng']
+
+        # Create a gmplot map centered on the mean of guessed latitudes and longitudes
+        gmap = gmplot.GoogleMapPlotter(latitudes.mean(), longitudes.mean(), 2)  # Zoom level 2
+
+        # Add markers for each guessed location
+        for index, row in duel_guesses.iterrows():
+            gmap.marker(row['guessed_lat'], row['guessed_lng'], title=f"Round {row['round_number']}")
+
+        # Save the map as an HTML file
+        gmap.draw("duel_guesses_google_map.html")
+
+        # Add the API key to the HTML
+        with open("duel_guesses_google_map.html", "r") as f:
+            html_content = f.read()
+
+        # Replace the placeholder with your API key from config.py
+        html_content = html_content.replace("YOUR_GOOGLE_MAPS_API_KEY", GOOGLE_API_KEY)
+
+        with open("duel_guesses_google_map.html", "w") as f:
+            f.write(html_content)
+
+        print("Map saved to duel_guesses_google_map.html")
+
+    except Exception as e:
+        print(f"Error creating duel guesses map: {e}")
     
 
 if __name__=="__main__":
