@@ -121,7 +121,7 @@ if ncfa:
     # In your Streamlit app:
     st.title("Duel Guesses Map")
     # Display the map in Streamlit using components.html
-    st.components.v1.html(open("duel_guesses_google_map.html").read(), height=600)
+    st.components.v1.html(open("duel_guesses_google_map.html").read(), height=600, scrolling=True)
 
     # JSON printing (separate button, always visible) - commented out for now
 #    if st.button("Print Game JSON (Caution: Large Output)"):
