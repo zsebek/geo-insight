@@ -315,7 +315,7 @@ def get_all_games(ncfa: str) -> list[dict]:
 def create_duel_guesses_google_map(duel_guesses):
     """
     Creates an embedded Google Map with markers for guessed locations and actual round locations in duel games.
-    Actual locations are marked with a custom icon and include lat/lng in the title.
+    Actual locations are marked with red pins and include lat/lng in the title.
 
     Args:
         duel_guesses (pd.DataFrame): DataFrame containing duel guess data with 'guessed_lat', 'guessed_lng', 'actual_lat', and 'actual_lng' columns.
@@ -336,11 +336,10 @@ def create_duel_guesses_google_map(duel_guesses):
         for index, row in duel_guesses.iterrows():
             gmap.marker(row['guessed_lat'], row['guessed_lng'], title=f"Guessed Round {row['round_number']}", color='blue')
 
-        # Add markers for each actual round location with custom icon and lat/lng in title
+        # Add markers for each actual round location (red markers) with lat/lng in title
         for index, row in duel_guesses.iterrows():
             title = f"Actual Round {row['round_number']} - Lat: {row['actual_lat']:.4f}, Lng: {row['actual_lng']:.4f}"
-            gmap.marker(row['actual_lat'], row['actual_lng'], title=title, 
-                        icon='images/GeoGuessr-Pin.png')  # Path to your icon
+            gmap.marker(row['actual_lat'], row['actual_lng'], title=title, color='red')  # Red markers
 
         # Save the map as an HTML file
         gmap.draw("duel_guesses_google_map.html")
@@ -350,7 +349,7 @@ def create_duel_guesses_google_map(duel_guesses):
             html_content = f.read()
 
         # Replace the placeholder with your API key from config.py
-        html_content = html_content.replace("YOUR_GOOGLE_MAPS_API_KEY", GOOGLE_API_KEY)
+        html_content = html_content.replace("YOUR_GOOGLE_MAPS_API_KEY", GOOGLE_API_KEY)  # Make sure GOOGLE_API_KEY is defined
 
         with open("duel_guesses_google_map.html", "w") as f:
             f.write(html_content)
@@ -358,7 +357,7 @@ def create_duel_guesses_google_map(duel_guesses):
         print("Map saved to duel_guesses_google_map.html")
 
     except Exception as e:
-        print(f"Error creating duel guesses map: {e}")    
+        print(f"Error creating duel guesses map: {e}")   
 
 if __name__=="__main__":
     ncfa = "OSNSzcFekc1dEHNEHcHJqBT%2FD9Y7xS1lgmEHUpPYm3s%3DPmea5NC7KbJh2tv3vaWyo8uc4HQfJyHKyLyzSdep%2BtvkLTa2ak7d8%2F3XrIkvKzKK6B79dO9xH4IvVc6PTsCsfwnkjySGP9%2FXgFwPD3nN40Q%3D"
