@@ -2,7 +2,7 @@ BASE_URL_V4 = "https://www.geoguessr.com/api/v4"
 BASE_URL_V3 = "https://www.geoguessr.com/api/v3"
 GAME_SERVER_DOMAIN = "game-server.geoguessr.com"
 GAME_SERVER_URL = "https://game-server.geoguessr.com/api"
-GOOGLE_API_KEY = "AIzaSyBPYQjyMDZ86BlsKu_Q3NchOWo68MOz1_0"
+GOOGLE_API_KEY = "AIzaSyCUzapfeCicefnE0ANICmK9EguDeDP1Tt4"
 
 country_codes = {
     'ad': 'Andorra',
