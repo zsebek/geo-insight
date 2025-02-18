@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import utils
 import json
-from aggregation import get_games_guesses_duels_dataframes
+from aggregation import get_games_guesses_duels_dataframes, create_duel_guesses_google_map
 
 st.title('GeoCoach')
 st.write('''
